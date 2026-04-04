@@ -1,0 +1,23 @@
+name: Quality
+
+on:
+  workflow_call:
+  pull_request:
+    branches: [develop]
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup
+        uses: ./.github/actions/setup
+      - name: Run Composer validate
+        run: composer validate
+      - name: Run Composer Audit
+        run: composer audit
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+      - name: Run Pint
+        run: vendor/bin/pint --test
