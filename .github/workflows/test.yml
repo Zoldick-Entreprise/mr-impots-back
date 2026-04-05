@@ -1,0 +1,29 @@
+name: Test 
+
+on:
+  workflow_call:
+  pull_request:
+    branches: [develop]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup
+        uses: ./.github/actions/setup
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+      - name: Prepare test environment
+        env:
+          APP_ENV: testing
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
+        run: |
+          if [ -f .env.example ] && [ ! -f .env ]; then
+            cp .env.example .env
+            php artisan key:generate
+          fi
+      - name: Run test
+        run: php artisan test
