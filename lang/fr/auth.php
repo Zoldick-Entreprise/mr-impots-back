@@ -19,4 +19,6 @@ return [
     'login' => [
         'success' => 'Connexion réussie.',
     ],
+    'google_failed' => "Échec de l'authentification avec Google.",
+    'google_password_reset' => 'Ce compte est authentifié via Google et ne utilise pas de mot de passe.',
 ];

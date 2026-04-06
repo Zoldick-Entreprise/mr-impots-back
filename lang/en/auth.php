@@ -20,4 +20,6 @@ return [
     'login' => [
         'success' => 'Logged in successfully.',
     ],
+    'google_failed' => 'Failed to authenticate with Google.',
+    'google_password_reset' => 'This account is authenticated via Google and does not use a password.',
 ];
