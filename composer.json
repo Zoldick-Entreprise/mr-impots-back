@@ -10,8 +10,10 @@
     "license": "MIT",
     "require": {
         "php": "^8.4",
+        "dedoc/scramble": "^0.13.17",
         "laravel/framework": "^13.0",
         "laravel/sanctum": "^4.0",
+        "laravel/socialite": "^5.26",
         "laravel/tinker": "^3.0",
         "predis/predis": "^3.4",
         "spatie/laravel-medialibrary": "^11.21",

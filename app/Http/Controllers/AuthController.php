@@ -7,15 +7,29 @@ namespace App\Http\Controllers;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Laravel\Socialite\Facades\Socialite;
 
+/**
+ * Class AuthController
+ *
+ * Handles user authentication processes including registration, login,
+ * password management, and OAuth2 social authentication via Google.
+ */
 final class AuthController extends Controller
 {
-    public function register(Request $request)
+    /**
+     * Register a new user with standard credentials.
+     *
+     * @param  Request  $request  The incoming HTTP request containing registration data.
+     * @return JsonResponse Contains the created user resource and authentication token.
+     */
+    public function register(Request $request): JsonResponse
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -43,7 +57,15 @@ final class AuthController extends Controller
         );
     }
 
-    public function login(Request $request)
+    /**
+     * Authenticate a user with email and password.
+     *
+     * @param  Request  $request  The incoming HTTP request containing login credentials.
+     * @return JsonResponse Contains the user resource and authentication token.
+     *
+     * @throws ValidationException If authentication fails.
+     */
+    public function login(Request $request): JsonResponse
     {
         $request->validate([
             'email' => 'required|string|email',
@@ -52,7 +74,11 @@ final class AuthController extends Controller
 
         $user = User::where('email', $request->email)->first();
 
-        if (! $user || ! Hash::check($request->password, $user->password)) {
+        if (
+            ! $user ||
+            ! $user->password ||
+            ! Hash::check($request->password, $user->password)
+        ) {
             throw ValidationException::withMessages([
                 'email' => [__('auth.failed')],
             ]);
@@ -60,20 +86,39 @@ final class AuthController extends Controller
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        return response()->json(
-            [
-                'message' => __('auth.login.success'),
-                'data' => [
-                    'token' => $token,
-                    'user' => UserResource::make($user),
-                ],
-            ]
-        );
+        return response()->json([
+            'message' => __('auth.login.success'),
+            'data' => [
+                'token' => $token,
+                'user' => UserResource::make($user),
+            ],
+        ]);
     }
 
-    public function forgotPassword(Request $request)
+    /**
+     * Send a password reset link to the given email address.
+     *
+     * Blocks requests for users created via Google OAuth who do not have a password.
+     *
+     * @param  Request  $request  The incoming HTTP request containing the email.
+     * @return JsonResponse Status message of the reset link dispatch.
+     *
+     * @throws ValidationException If the email is invalid or the user cannot reset their password.
+     */
+    public function forgotPassword(Request $request): JsonResponse
     {
         $request->validate(['email' => 'required|email']);
+
+        $user = User::where('email', $request->email)->first();
+
+        // Block password reset for Google OAuth users who never set a password
+        if ($user && $user->password === null && $user->google_id !== null) {
+            throw ValidationException::withMessages([
+                'email' => [
+                    __('auth.google_password_reset'),
+                ],
+            ]);
+        }
 
         $status = Password::broker()->sendResetLink($request->only('email'));
 
@@ -86,7 +131,15 @@ final class AuthController extends Controller
         ]);
     }
 
-    public function resetPassword(Request $request)
+    /**
+     * Reset the user's password using a token.
+     *
+     * @param  Request  $request  The incoming HTTP request containing reset data.
+     * @return JsonResponse Status message of the password reset.
+     *
+     * @throws ValidationException If the reset token or data is invalid.
+     */
+    public function resetPassword(Request $request): JsonResponse
     {
         $request->validate([
             'token' => 'required',
@@ -123,7 +176,13 @@ final class AuthController extends Controller
         ]);
     }
 
-    public function updatePassword(Request $request)
+    /**
+     * Update the authenticated user's password.
+     *
+     * @param  Request  $request  The incoming HTTP request containing old and new passwords.
+     * @return JsonResponse Success message.
+     */
+    public function updatePassword(Request $request): JsonResponse
     {
         $validated = $request->validate([
             'current_password' => 'required|current_password',
@@ -136,6 +195,79 @@ final class AuthController extends Controller
 
         return response()->json([
             'message' => __('auth.password_updated'),
+        ]);
+    }
+
+    /**
+     * Generate the Google OAuth redirect URL.
+     *
+     * Returns the authorization URL so the client (frontend) can redirect the user.
+     *
+     * @return JsonResponse The JSON payload containing the redirect URL.
+     */
+    public function redirectToGoogle(): JsonResponse
+    {
+        $url = Socialite::driver('google')
+            ->stateless()
+            ->redirect()
+            ->getTargetUrl();
+
+        return response()->json(['url' => $url]);
+    }
+
+    /**
+     * Handle the callback from Google OAuth.
+     *
+     * Links existing accounts, logs in known users, or creates new accounts for first-time visitors.
+     *
+     * @return JsonResponse Contains the user resource and authentication token.
+     *
+     * @throws ValidationException If OAuth authentication fails.
+     */
+    public function handleGoogleCallback(): JsonResponse
+    {
+        try {
+            $googleUser = Socialite::driver('google')->stateless()->user();
+        } catch (\Exception $e) {
+            throw ValidationException::withMessages([
+                'oauth' => [__('auth.google_failed')],
+            ]);
+        }
+
+        // 1. Check if we already have this exact Google account linked
+        $user = User::where('google_id', $googleUser->getId())->first();
+
+        if (! $user) {
+            // 2. Fallback to checking by email
+            $user = User::where('email', $googleUser->getEmail())->first();
+
+            if ($user) {
+                // Link Google to the existing account
+                $user->update([
+                    'google_id' => $googleUser->getId(),
+                    'avatar' => $user->avatar ?? $googleUser->getAvatar(),
+                ]);
+            } else {
+                // 3. Create a brand new account without a password
+                $user = User::create([
+                    'name' => $googleUser->getName(),
+                    'email' => $googleUser->getEmail(),
+                    'google_id' => $googleUser->getId(),
+                    'avatar' => $googleUser->getAvatar(),
+                    'password' => null, // Password intentionally left null for OAuth users
+                ]);
+            }
+        }
+
+        // Generate an API token for the user
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'message' => __('auth.login.success'),
+            'data' => [
+                'token' => $token,
+                'user' => UserResource::make($user),
+            ],
         ]);
     }
 }
