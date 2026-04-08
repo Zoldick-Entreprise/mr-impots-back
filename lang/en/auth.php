@@ -22,4 +22,5 @@ return [
     ],
     'google_failed' => 'Failed to authenticate with Google.',
     'google_password_reset' => 'This account is authenticated via Google and does not use a password.',
+    'google_password_change_blocked' => 'Users logged in via Google cannot change their password.',
 ];

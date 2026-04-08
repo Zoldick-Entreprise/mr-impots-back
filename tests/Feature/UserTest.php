@@ -18,7 +18,7 @@ final class UserTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user, 'sanctum')->getJson('/api/auth/me');
+        $response = $this->actingAs($user, 'sanctum')->getJson('/api/profile');
 
         $response
             ->assertStatus(200)
@@ -31,8 +31,8 @@ final class UserTest extends TestCase
             'password' => bcrypt('old_password'),
         ]);
 
-        $response = $this->actingAs($user, 'sanctum')->putJson(
-            '/api/auth/update-password',
+        $response = $this->actingAs($user, 'sanctum')->patchJson(
+            '/api/profile/password',
             [
                 'current_password' => 'old_password',
                 'password' => 'new_password',
@@ -55,8 +55,8 @@ final class UserTest extends TestCase
             'preferred_language' => 'fr',
         ]);
 
-        $response = $this->actingAs($user, 'sanctum')->putJson(
-            '/api/auth/update-password',
+        $response = $this->actingAs($user, 'sanctum')->patchJson(
+            '/api/profile/password',
             [
                 'current_password' => 'wrong',
                 'password' => 'new_password',

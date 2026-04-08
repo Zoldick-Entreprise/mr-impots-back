@@ -45,7 +45,7 @@ final class GoogleOAuthTest extends TestCase
             '12345',
             'newuser@example.com',
             'New User',
-            'http://example.com/avatar.jpg',
+            'https://picsum.photos/200/300',
         );
 
         $response = $this->getJson('/api/auth/google/callback');
@@ -63,7 +63,6 @@ final class GoogleOAuthTest extends TestCase
         $this->assertDatabaseHas('users', [
             'email' => 'newuser@example.com',
             'google_id' => '12345',
-            'avatar' => 'http://example.com/avatar.jpg',
             'password' => null,
         ]);
     }
@@ -78,14 +77,13 @@ final class GoogleOAuthTest extends TestCase
             'email' => 'existing@example.com',
             'password' => bcrypt('password123'),
             'google_id' => null,
-            'avatar' => null,
         ]);
 
         $this->mockSocialite(
             '67890',
             'existing@example.com',
             'Existing User',
-            'http://example.com/new-avatar.jpg',
+            'https://picsum.photos/200/300',
         );
 
         $response = $this->getJson('/api/auth/google/callback');
@@ -96,7 +94,6 @@ final class GoogleOAuthTest extends TestCase
             'id' => $user->id,
             'email' => 'existing@example.com',
             'google_id' => '67890',
-            'avatar' => 'http://example.com/new-avatar.jpg',
         ]);
 
         $this->assertNotNull(
@@ -120,7 +117,7 @@ final class GoogleOAuthTest extends TestCase
             '99999',
             'googleuser@example.com',
             'Google User',
-            'http://example.com/avatar.jpg',
+            'https://picsum.photos/200/300',
         );
 
         $response = $this->getJson('/api/auth/google/callback');
