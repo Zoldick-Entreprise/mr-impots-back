@@ -46,10 +46,13 @@ Route::prefix('auth')
 
         Route::middleware('auth:sanctum')->group(function () {
             Route::post('/logout', [UserController::class, 'logout']);
-            Route::get('/me', [UserController::class, 'me']);
-            Route::put('/update-password', [
-                UserController::class,
-                'updatePassword',
-            ]);
         });
+    });
+
+Route::prefix('profile')
+    ->middleware(['auth:sanctum', SetLocale::class])
+    ->group(function () {
+        Route::get('/', [UserController::class, 'me']);
+        Route::patch('/', [UserController::class, 'update']);
+        Route::patch('/password', [UserController::class, 'updatePassword']);
     });

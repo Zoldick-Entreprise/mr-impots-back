@@ -10,6 +10,7 @@ use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -114,9 +115,7 @@ final class AuthController extends Controller
         // Block password reset for Google OAuth users who never set a password
         if ($user && $user->password === null && $user->google_id !== null) {
             throw ValidationException::withMessages([
-                'email' => [
-                    __('auth.google_password_reset'),
-                ],
+                'email' => [__('auth.google_password_reset')],
             ]);
         }
 
@@ -245,7 +244,6 @@ final class AuthController extends Controller
                 // Link Google to the existing account
                 $user->update([
                     'google_id' => $googleUser->getId(),
-                    'avatar' => $user->avatar ?? $googleUser->getAvatar(),
                 ]);
             } else {
                 // 3. Create a brand new account without a password
@@ -253,9 +251,18 @@ final class AuthController extends Controller
                     'name' => $googleUser->getName(),
                     'email' => $googleUser->getEmail(),
                     'google_id' => $googleUser->getId(),
-                    'avatar' => $googleUser->getAvatar(),
                     'password' => null, // Password intentionally left null for OAuth users
                 ]);
+
+                if ($googleUser->getAvatar()) {
+                    try {
+                        $user
+                            ->addMediaFromUrl($googleUser->getAvatar())
+                            ->toMediaCollection('avatar');
+                    } catch (\Exception $e) {
+                        Log::warning('Failed to fetch Google avatar: '.$e->getMessage());
+                    }
+                }
             }
         }
 

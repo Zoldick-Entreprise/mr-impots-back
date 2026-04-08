@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Enums\DefaultRole;
 use App\Enums\Permission;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\AdminResource;
 use App\Models\User;
 use App\Repositories\Contracts\UserRepository;
 use Illuminate\Http\JsonResponse;
@@ -45,7 +46,7 @@ final class UserController extends Controller
 
         $users = $this->userRepository->getNormalUsers($request->query());
 
-        return response()->json($users);
+        return AdminResource::collection($users)->response();
     }
 
     /**
@@ -66,7 +67,16 @@ final class UserController extends Controller
             $request->query(),
         );
 
-        return response()->json($admins);
+        return AdminResource::collection($admins)->response();
+    }
+
+    public function show(Request $request, User $user): JsonResponse
+    {
+        Gate::authorize('view', $user);
+
+        $user = $this->userRepository->retrieve($user->id);
+
+        return AdminResource::make($user)->response();
     }
 
     /**
@@ -96,8 +106,8 @@ final class UserController extends Controller
 
         // Prevent creating 'super-admin' unless the current user is a super-admin
         if (
-            $validated['role'] === 'super-admin' &&
-            ! $request->user()->hasRole('super-admin')
+            $validated['role'] === DefaultRole::SUPER_ADMIN &&
+            ! $request->user()->hasRole(DefaultRole::SUPER_ADMIN)
         ) {
             abort(403, 'Unauthorized to create a super-admin.');
         }
@@ -118,7 +128,9 @@ final class UserController extends Controller
         return response()->json(
             [
                 'message' => 'Administrator created successfully.',
-                'user' => $admin->load(['roles', 'permissions']),
+                'user' => AdminResource::make(
+                    $admin->load(['roles', 'permissions']),
+                ),
             ],
             201,
         );
@@ -166,7 +178,7 @@ final class UserController extends Controller
 
         return response()->json([
             'message' => 'User role updated successfully.',
-            'user' => $user->load('roles'),
+            'user' => AdminResource::make($user->load('roles')),
         ]);
     }
 }
