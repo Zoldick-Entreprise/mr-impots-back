@@ -26,7 +26,8 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     opcache \
     zip \
     mbstring \
-    gd
+    gd \
+    exif
 
 # PHP production configuration
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
