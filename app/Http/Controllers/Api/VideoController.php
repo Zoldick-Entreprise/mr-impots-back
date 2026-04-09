@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Video;
+use Illuminate\Http\Request;
 
 class VideoController extends Controller
 {
@@ -26,18 +26,18 @@ class VideoController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            "title" => "required|array",
-            "description" => "required|array",
-            "category_id" => "required|exists:categories,id",
-            "published_at" => "required|date",
-            "video" => "required|file|mimes:mp4,mov,avi,wmv|max:204800",
+            'title' => 'required|array',
+            'description' => 'required|array',
+            'category_id' => 'required|exists:categories,id',
+            'published_at' => 'required|date',
+            'video' => 'required|file|mimes:mp4,mov,avi,wmv|max:204800',
         ]);
 
         $video = Video::create([
-            "title" => $request->title,
-            "description" => $request->description,
-            "category_id" => $request->category_id,
-            "published_at" => $request->published_at,
+            'title' => $request->title,
+            'description' => $request->description,
+            'category_id' => $request->category_id,
+            'published_at' => $request->published_at,
         ]);
 
         if ($request->hasFile('video')) {
@@ -46,8 +46,8 @@ class VideoController extends Controller
                 ->toDisk('r2_videos');
 
             $video->update([
-                "video_url" => $video->getFirstMediaUrl('videos'),
-                "thumbnail_url" => $video->getFirstMediaUrl('videos', 'thumb'),
+                'video_url' => $video->getFirstMediaUrl('videos'),
+                'thumbnail_url' => $video->getFirstMediaUrl('videos', 'thumb'),
             ]);
         }
     }
@@ -58,6 +58,7 @@ class VideoController extends Controller
     public function show(string $id)
     {
         $video = Video::with('category')->findOrFail($id);
+
         return response()->json($video);
     }
 
@@ -69,17 +70,17 @@ class VideoController extends Controller
         $video = Video::findOrFail($id);
 
         $request->validate([
-            "title" => "required|array",
-            "description" => "required|array",
-            "category_id" => "required|exists:categories,id",
-            "published_at" => "required|date",
+            'title' => 'required|array',
+            'description' => 'required|array',
+            'category_id' => 'required|exists:categories,id',
+            'published_at' => 'required|date',
         ]);
 
         $video->update([
-            "title" => $request->title,
-            "description" => $request->description,
-            "category_id" => $request->category_id,
-            "published_at" => $request->published_at,
+            'title' => $request->title,
+            'description' => $request->description,
+            'category_id' => $request->category_id,
+            'published_at' => $request->published_at,
         ]);
 
         return response()->json($video);
@@ -93,6 +94,7 @@ class VideoController extends Controller
     {
         $video = Video::findOrFail($id);
         $video->delete();
+
         return response()->json(null, 204);
     }
 }
