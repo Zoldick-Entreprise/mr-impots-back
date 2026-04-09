@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\Category;
 use App\Http\Resources\CategoryResource;
+use App\Models\Category;
+use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
@@ -49,7 +49,7 @@ class CategoryController extends Controller
         return new CategoryResource(
             $category
                 ->load('children')
-        )  ;
+        );
     }
 
     /**
@@ -58,6 +58,7 @@ class CategoryController extends Controller
     public function update(Request $request, Category $category)
     {
         $category->update($request->all());
+
         return new CategoryResource($category);
     }
 
@@ -67,6 +68,7 @@ class CategoryController extends Controller
     public function destroy(Category $category)
     {
         $category->delete();
+
         return response()->json([
             'message' => 'Category deleted successfully',
         ]);
