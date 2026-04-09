@@ -72,7 +72,7 @@ final class AuthController extends Controller
             'email' => 'required|string|email',
             'password' => 'required|string',
         ]);
-
+        
         $user = User::where('email', $request->email)->first();
 
         if (
