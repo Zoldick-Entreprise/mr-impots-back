@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('videos', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->json('title');
             $table->json('description');
-            $table->string('video_url');
+            $table->string('video_url')->nullable();
             $table->string('thumbnail_url')->nullable();
             $table->foreignId('category_id')->constrained()->onDelete('cascade');
             $table->boolean('is_featured')->default(false);

@@ -42,14 +42,15 @@ class VideoController extends Controller
 
         if ($request->hasFile('video')) {
             $video->addMedia($request->file('video'))
-                ->toMediaCollection('videos')
-                ->toDisk('r2_videos');
+                ->toMediaCollection('videos', 'r2_videos');
 
             $video->update([
                 'video_url' => $video->getFirstMediaUrl('videos'),
                 'thumbnail_url' => $video->getFirstMediaUrl('videos', 'thumb'),
             ]);
         }
+
+        return response()->json($video, 201);
     }
 
     /**
