@@ -21,7 +21,7 @@ class CategorySeeder extends Seeder
             'sort_order' => 1,
         ]);
 
-        // sous-catégories pour informatique
+        // sous-catégories pour droit
         Category::create([
             'name' => ['fr' => 'Droit Privé', 'en' => 'Private Law'],
             'slug' => 'droit-prive',

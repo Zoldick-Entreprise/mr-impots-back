@@ -8,6 +8,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\VideoController;
 
 Route::prefix('admin')
     ->middleware(['auth:sanctum', 'can:admin.access', SetLocale::class])

@@ -38,7 +38,10 @@ class CategoryController extends Controller
 
         $category = Category::create($data);
 
-        return new CategoryResource($category);
+        return (new CategoryResource($category)
+            ->response()
+            ->setStatusCode(201)
+        );
     }
 
     /**
@@ -57,6 +60,12 @@ class CategoryController extends Controller
      */
     public function update(Request $request, Category $category)
     {
+        $request->validate([
+            'name' => 'sometimes|required|array',
+            'icon' => 'nullable|string',
+            'parent_id' => 'nullable|exists:categories,id',
+        ]);
+
         $category->update($request->all());
 
         return new CategoryResource($category);
