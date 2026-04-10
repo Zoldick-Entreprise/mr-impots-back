@@ -20,7 +20,7 @@ services:
       - key: APP_KEY
         sync: false # Vous devrez générer la clé (php artisan key:generate --show) et l'ajouter manuellement dans le dashboard Render
       - key: LOG_CHANNEL
-        value: "stderr"
+        value: "errorlog"
       - key: LOG_STDERR_FORMATTER
         value: "Monolog\\Formatter\\JsonFormatter"
       - key: DB_CONNECTION
