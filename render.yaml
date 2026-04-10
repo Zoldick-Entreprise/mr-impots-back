@@ -9,7 +9,7 @@ services:
     name: mr-impots-web
     env: docker
     plan: free
-    healthCheckPath: /
+    healthCheckPath: /up
     envVars:
       - key: APP_NAME
         value: "MrImpots"
@@ -17,6 +17,14 @@ services:
         value: "production"
       - key: APP_DEBUG
         value: "false"
+      - key: TELESCOPE_ENABLED
+        value: "true"
+      - key: TELESCOPE_ALLOWED_EMAILS
+        value: "admin@example.com" # À remplacer par tes emails séparés par des virgules
+      - key: FRONTEND_URL
+        value: "https://votre-frontend-domaine.com" # À remplacer par le vrai domaine du front-end
+      - key: ADMIN_URL
+        value: "https://votre-admin-domaine.com" # À remplacer par le vrai domaine de l'admin
       - key: APP_KEY
         sync: false # Vous devrez générer la clé (php artisan key:generate --show) et l'ajouter manuellement dans le dashboard Render
       - key: LOG_CHANNEL
