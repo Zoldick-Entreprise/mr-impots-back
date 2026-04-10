@@ -36,7 +36,7 @@ final class AppServiceProvider extends ServiceProvider
     public function bootGate(): void
     {
         Gate::before(function (mixed $user, string $ability): ?bool {
-            return $user->hasRole(DefaultRole::SUPER_ADMIN) ? true : null;
+            return $user?->hasRole(DefaultRole::SUPER_ADMIN) ? true : null;
         });
     }
 
