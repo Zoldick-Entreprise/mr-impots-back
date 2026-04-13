@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -17,10 +19,10 @@ return new class extends Migration
             $table->json('description');
             $table->string('video_url')->nullable();
             $table->string('thumbnail_url')->nullable();
-            $table->foreignId('category_id')->constrained()->onDelete('cascade');
+            $table->foreignUuid('category_id')->constrained()->onDelete('cascade');
             $table->boolean('is_featured')->default(false);
             $table->integer('views_count')->default(0);
-            $table->date('published_at');
+            $table->datetime('published_at')->nullable();
             $table->timestamps();
         });
     }

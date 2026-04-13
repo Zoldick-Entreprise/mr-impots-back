@@ -1,7 +1,9 @@
 <?php
 
+declare(strict_types=1);
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -17,10 +19,13 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read Carbon $updated_at The last update timestamp of the user.
  * @property-read Media $avatar The avatar media of the user.
  */
-
-
 final class Category extends Model
 {
+    use HasUuids;
+
+    protected $keyType = 'string';
+
+    public $incrementing = false;
     protected $fillable = [
         'parent_id',
         'name',
