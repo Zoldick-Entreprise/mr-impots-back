@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 /**
  * Represents a user in the system.
@@ -31,8 +31,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 // Media
 final class Video extends Model implements HasMedia
 {
-    use InteractsWithMedia, HasUuids;
-
+    use HasUuids, InteractsWithMedia;
 
     protected $with = ['media'];
 

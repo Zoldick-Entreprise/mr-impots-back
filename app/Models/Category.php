@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -26,6 +27,7 @@ final class Category extends Model
     protected $keyType = 'string';
 
     public $incrementing = false;
+
     protected $fillable = [
         'parent_id',
         'name',

@@ -40,7 +40,7 @@ final class CategoryTest extends TestCase
 
         $response = $this->actingAs($admin, 'sanctum')->postJson(
             '/api/admin/categories', $payload
-            );
+        );
 
         $response
             ->assertCreated()
