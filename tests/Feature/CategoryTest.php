@@ -25,7 +25,7 @@ final class CategoryTest extends TestCase
     /**
      * A basic feature test example.
      */
-    public function test_an_category_can_be_added(): void
+    public function test_a_category_can_be_added(): void
     {
         $admin = User::factory()->create();
         $admin->assignRole(DefaultRole::ADMIN);

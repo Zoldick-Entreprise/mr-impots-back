@@ -8,13 +8,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\CategoryResource;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
 final class CategoryController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index():JsonResponse
     {
         $categories = Category::with('children')
             ->whereNull('parent_id')
@@ -61,13 +62,15 @@ final class CategoryController extends Controller
      */
     public function update(Request $request, Category $category)
     {
-        $request->validate([
+        
+    
+    $data = $request->validate([
             'name' => 'sometimes|required|array',
             'icon' => 'nullable|string',
             'parent_id' => 'nullable|exists:categories,id',
         ]);
 
-        $category->update($request->validated());
+        $category->update($data);
 
         return new CategoryResource($category);
     }

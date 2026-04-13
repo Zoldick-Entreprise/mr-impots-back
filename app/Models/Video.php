@@ -12,7 +12,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
- * Represents a user in the system.
+ * Represents a video in the system.
  *
  * @property string $id The unique identifier of the video.
  * @property null|string $category_id The parent ID of the category.
@@ -51,7 +51,7 @@ final class Video extends Model implements HasMedia
         'description' => 'array',
         'is_featured' => 'boolean',
         'views_count' => 'integer',
-        'published_at' => 'date',
+        'published_at' => 'datetime',
     ];
 
     public function category()

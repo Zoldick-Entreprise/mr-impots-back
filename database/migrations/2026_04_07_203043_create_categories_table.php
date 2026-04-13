@@ -14,9 +14,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('categories', function (Blueprint $table) {
-            $table->Uuid('id')->primary();
-            $table->foreignUuid('parent_id')->nullable()->constrained('categories');
+            $table->uuid('id')->primary();
             $table->json('name');
+            $table->foreignUuid('parent_id')->nullable()->constrained('categories')->nullOnDelete();
             $table->string('slug')->unique();
             $table->string('icon')->nullable();
             $table->integer('sort_order');
