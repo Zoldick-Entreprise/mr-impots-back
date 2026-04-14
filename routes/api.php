@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Api\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\VideoController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\SetLocale;
@@ -18,6 +20,20 @@ Route::prefix('admin')
             AdminUserController::class,
             'updateRole',
         ]);
+
+        // Categories
+        Route::get('/categories', [CategoryController::class, 'index']);
+        Route::post('/categories', [CategoryController::class, 'store']);
+        Route::get('/categories/{category}', [CategoryController::class, 'show']);
+        Route::put('/categories/{category}', [CategoryController::class, 'update']);
+        Route::delete('/categories/{category}', [CategoryController::class, 'destroy']);
+
+        // Videos
+        Route::get('/videos', [VideoController::class, 'index']);
+        Route::post('/videos', [VideoController::class, 'store']);
+        Route::get('/videos/{video}', [VideoController::class, 'show']);
+        Route::put('/videos/{video}', [VideoController::class, 'update']);
+        Route::delete('/videos/{video}', [VideoController::class, 'destroy']);
     });
 
 Route::prefix('auth')
