@@ -24,10 +24,11 @@ Route::prefix('admin')
         ]);
 
         // Categories
-        Route::apiResource('/categories', CategoryController::class);
+        Route::apiResource('/categories', CategoryController::class)->whereUuid('category');
 
         // Videos
-        Route::apiResource('/videos', VideoController::class);
+        Route::apiResource('/videos', VideoController::class)->whereUuid('video');
+        Route::post('/videos/{video}/toggle-publish', [VideoController::class, 'togglePublish']);
     });
 
 Route::prefix('auth')

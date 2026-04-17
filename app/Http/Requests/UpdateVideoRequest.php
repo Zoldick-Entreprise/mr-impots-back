@@ -25,10 +25,9 @@ final class UpdateVideoRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => ['required', 'array'],
-            'description' => ['required', 'array'],
-            'category_id' => ['required', 'exists:categories,id'],
-            'published_at' => ['required', 'date'],
+            'title' => ['sometimes', 'array'],
+            'description' => ['sometimes', 'array'],
+            'category_id' => ['sometimes', 'exists:categories,id'],
             'video' => ['sometimes', 'file', 'mimes:mp4,mov,avi,wmv', 'max:204800'],
         ];
     }

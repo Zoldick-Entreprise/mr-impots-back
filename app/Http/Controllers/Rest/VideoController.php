@@ -12,6 +12,7 @@ use App\Models\Video;
 use App\Repositories\Contracts\VideoRepository;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Support\Facades\Cache;
 
 final class VideoController extends Controller
 {
@@ -38,9 +39,7 @@ final class VideoController extends Controller
     {
         $this->authorize('create', Video::class);
 
-        $data = $request->validated();
-
-        $video = $this->videoRepository->create($data);
+        $video = $this->videoRepository->create($request->validated());
 
         if ($request->hasFile('video')) {
             $video
@@ -56,43 +55,60 @@ final class VideoController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $video)
     {
-        $video = $this->videoRepository->whereFirstOrFail(['id' => $id]);
+        $model = $this->videoRepository->retrieve($video);
 
-        $this->authorize('view', $video);
+        $this->authorize('view', $model);
 
-        return VideoResource::make($video)->response();
+        return VideoResource::make($model)->response();
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateVideoRequest $request, string $id)
+    public function update(UpdateVideoRequest $request, string $video)
     {
-        $video = $this->videoRepository->whereFirstOrFail(['id' => $id]);
+        $model = $this->videoRepository->retrieve($video);
+
+        $this->authorize('update', $model);
+
+        $model = $this->videoRepository->update($model, $request->validated());
+
+        if ($request->hasFile('video')) {
+            $model->addMedia($request->file('video'))
+                ->toMediaCollection('video');
+
+            Cache::forget("thumbnail_url_{$model->id}");
+            Cache::forget("video_url_{$model->id}");
+        }
+
+        return VideoResource::make($model)->response();
+    }
+
+    /**
+     * Toggle the published status of the specified resource.
+     */
+    public function togglePublish(string $id)
+    {
+        $video = $this->videoRepository->retrieve($id);
 
         $this->authorize('update', $video);
 
-        $data = $request->validated();
+        $video = $this->videoRepository->update($video, ['published' => ! $video->published]);
 
-        $video = $this->videoRepository->update($id, $data);
-        $video->unsetRelation('media');
-
-        return VideoResource::make($video);
+        return VideoResource::make($video)->response();
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Video $video)
     {
-        $video = $this->videoRepository->whereFirstOrFail(['id' => $id]);
-
         $this->authorize('delete', $video);
 
-        $this->videoRepository->delete($id);
+        $this->videoRepository->delete($video);
 
-        return response()->json(null, 204);
+        return $this->successResponse(status: 204);
     }
 }

@@ -6,8 +6,8 @@ namespace App\Repositories\Contracts;
 
 use App\Models\Video;
 use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Spatie\QueryBuilder\QueryBuilder;
 
 /**
  * Interface VideoRepository
@@ -18,7 +18,7 @@ use Spatie\QueryBuilder\QueryBuilder;
  *
  * @extends Repository<Video>
  *
- * @method QueryBuilder published()
+ * @method Builder published()
  */
 interface VideoRepository extends Repository
 {

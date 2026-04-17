@@ -27,7 +27,6 @@ final class StoreCategoryRequest extends FormRequest
         return [
             'name' => ['required', 'array'],
             'slug' => ['required', 'string', 'unique:categories,slug'],
-            'icon' => ['nullable', 'string'],
             'parent_id' => ['nullable', 'exists:categories,id'],
             'sort_order' => ['required', 'integer'],
         ];

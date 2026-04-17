@@ -23,5 +23,5 @@ interface CategoryRepository extends Repository
      *
      * @return Collection<int, Category>
      */
-    public function getRootCategoriesWithChildren(): Collection;
+    public function getRootCategoriesWithChildrens(): Collection;
 }

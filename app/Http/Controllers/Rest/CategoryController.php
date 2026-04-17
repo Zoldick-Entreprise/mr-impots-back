@@ -11,7 +11,9 @@ use App\Http\Resources\CategoryResource;
 use App\Models\Category;
 use App\Repositories\Contracts\CategoryRepository;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Symfony\Component\HttpFoundation\Response;
 
 final class CategoryController extends Controller
 {
@@ -34,7 +36,7 @@ final class CategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreCategoryRequest $request)
+    public function store(StoreCategoryRequest $request): JsonResponse
     {
         $this->authorize('create', Category::class);
 
@@ -46,21 +48,21 @@ final class CategoryController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $id): JsonResponse
     {
-        $category = $this->categoryRepository->whereFirstOrFail(['id' => $id]);
+        $category = $this->categoryRepository->retrieve($id);
 
         $this->authorize('view', $category);
 
-        return new CategoryResource($category->load('children'));
+        return new CategoryResource($category->load('childrens'))->response();
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateCategoryRequest $request, string $id)
+    public function update(UpdateCategoryRequest $request, string $id): JsonResponse
     {
-        $category = $this->categoryRepository->whereFirstOrFail(['id' => $id]);
+        $category = $this->categoryRepository->retrieve($id);
 
         $this->authorize('update', $category);
 
@@ -69,13 +71,13 @@ final class CategoryController extends Controller
             $request->validated(),
         );
 
-        return new CategoryResource($category);
+        return new CategoryResource($category)->response();
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $id): JsonResponse
     {
         $category = $this->categoryRepository->whereFirstOrFail(['id' => $id]);
 
@@ -83,8 +85,6 @@ final class CategoryController extends Controller
 
         $this->categoryRepository->delete($id);
 
-        return response()->json([
-            'message' => 'Category deleted successfully',
-        ]);
+        return $this->successResponse(status: Response::HTTP_NO_CONTENT);
     }
 }

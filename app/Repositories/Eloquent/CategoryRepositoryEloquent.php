@@ -40,26 +40,20 @@ final class CategoryRepositoryEloquent extends CommonRepository implements Categ
         parent::__construct([
             'filters' => ['name', 'slug', 'parent_id'],
             'sorts' => ['id', 'sort_order', 'created_at'],
-            'includes' => ['children', 'parent'],
+            'includes' => ['childrens', 'parent'],
             'relations' => [],
         ]);
     }
 
     /**
-     * Retrieve all root categories (categories without a parent) and eager load their children.
-     * Ordered by sort_order for consistent display.
-     *
-     * @return Collection<int, Category>
+     * {@inheritdoc}
      */
-    public function getRootCategoriesWithChildren(): Collection
+    public function getRootCategoriesWithChildrens(): Collection
     {
-        /** @var Collection<int, Category> $categories */
-        $categories = $this->buildQuery()
-            ->with('children')
+        return $this->buildQuery()
+            ->with('childrens')
             ->whereNull('parent_id')
             ->orderBy('sort_order')
             ->get();
-
-        return $categories;
     }
 }

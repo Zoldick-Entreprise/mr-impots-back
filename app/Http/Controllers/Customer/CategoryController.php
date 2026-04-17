@@ -23,22 +23,22 @@ final class CategoryController extends Controller
     ) {}
 
     /**
-     * Display a structured listing of root categories with their children.
+     * Display a structured listing of root categories with their childrens.
      */
     public function index(): ResourceCollection
     {
-        // Retrieves only root categories and eager loads their children
+        // Retrieves only root categories and eager loads theirs childrens
         // preventing huge flat payloads and structuring the data for the UI
-        $categories = $this->categoryRepository->getRootCategoriesWithChildren();
+        $categories = $this->categoryRepository->getRootCategoriesWithChildrens();
 
         return CategoryResource::collection($categories);
     }
 
     /**
-     * Display a specific category with its immediate children.
+     * Display a specific category with its immediate childrens.
      */
     public function show(Category $category): CategoryResource
     {
-        return new CategoryResource($category->load('children'));
+        return new CategoryResource($category->load('childrens'));
     }
 }

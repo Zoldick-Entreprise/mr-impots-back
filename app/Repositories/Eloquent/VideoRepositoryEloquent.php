@@ -44,7 +44,7 @@ final class VideoRepositoryEloquent extends CommonRepository implements VideoRep
             'filters' => ['title', 'category_id', 'is_featured', 'published_at'],
             'sorts' => ['id', 'published_at', 'views_count', 'created_at'],
             'includes' => ['category', 'media'],
-            'relations' => ['category'],
+            'relations' => ['category', 'media'],
         ]);
     }
 

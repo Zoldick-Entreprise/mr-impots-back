@@ -11,10 +11,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /**
  * Class VideoResource
  *
- * Transforms the Video model into a comprehensive JSON payload intended for the Rest (Admin) API.
- * This resource exposes all internal fields, raw timestamps, and relations necessary for administrative panels.
- *
- * @mixin Video
+ * @property Video $resource
  */
 final class VideoResource extends JsonResource
 {
@@ -27,15 +24,15 @@ final class VideoResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
-            'category_id' => $this->category_id,
-            'title' => $this->title, // Translatable array
-            'description' => $this->description, // Translatable array
-            'video_url' => $this->video_url,
-            'thumbnail_url' => $this->thumbnail_url,
-            'is_featured' => $this->is_featured,
-            'views_count' => $this->views_count,
-            'published_at' => $this->published_at?->toIso8601String(),
+            'id' => $this->resource->id,
+            'category_id' => $this->resource->category_id,
+            'title' => $this->resource->title,
+            'description' => $this->resource->description,
+            'video_url' => $this->resource->video_url,
+            'thumbnail_url' => $this->resource->thumbnail_url,
+            'is_featured' => $this->resource->is_featured,
+            'views_count' => $this->resource->views_count,
+            'published_at' => $this->resource->published_at?->toIso8601String(),
             'category' => new CategoryResource($this->whenLoaded('category')),
         ];
     }
