@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers\Api\Admin;
+namespace App\Http\Controllers\Rest;
 
 use App\Enums\DefaultRole;
 use App\Enums\Permission;
