@@ -13,9 +13,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('documents', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+        Schema::table('videos', function (Blueprint $table) {
+            $table->dropColumn(['video_url', 'thumbnail_url']);
         });
     }
 
@@ -24,6 +23,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('documents');
+        Schema::table('videos', function (Blueprint $table) {
+            $table->string('video_url')->nullable();
+            $table->string('thumbnail_url')->nullable();
+        });
     }
 };

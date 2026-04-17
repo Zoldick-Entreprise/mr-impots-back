@@ -51,23 +51,28 @@ final class RolesAndPermissionsSeeder extends Seeder
         $adminRole->syncPermissions([
             PermissionEnum::ADMIN_ACCESS->value,
             PermissionEnum::USER_VIEW->value,
-            PermissionEnum::DOCUMENT_ALL->value,
-            PermissionEnum::CATEGORY_ALL->value,
-            PermissionEnum::VIDEO_ALL->value,
+            PermissionEnum::CATEGORY_VIEW->value,
+            PermissionEnum::CATEGORY_CREATE->value,
+            PermissionEnum::CATEGORY_UPDATE->value,
+            PermissionEnum::CATEGORY_DELETE->value,
+            PermissionEnum::VIDEO_VIEW->value,
+            PermissionEnum::VIDEO_CREATE->value,
+            PermissionEnum::VIDEO_UPDATE->value,
+            PermissionEnum::VIDEO_DELETE->value,
         ]);
 
         // Create 'super-admin' role
         // Note: The 'super-admin' gets all permissions implicitly via Gate::before in AppServiceProvider
-        $superAdminRole = Role::firstOrCreate(['name' => DefaultRole::SUPER_ADMIN]);
+        $superAdminRole = Role::firstOrCreate([
+            'name' => DefaultRole::SUPER_ADMIN,
+        ]);
 
         // Create default super-admin user
         $superAdmin = User::firstOrCreate(
             ['email' => 'superadmin@example.com'],
             [
                 'name' => 'Super Admin',
-                'password' => Hash::make(
-                    'password',
-                ),
+                'password' => Hash::make('password'),
             ],
         );
 

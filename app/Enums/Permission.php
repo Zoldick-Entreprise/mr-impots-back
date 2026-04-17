@@ -26,13 +26,19 @@ enum Permission: string
     case ROLE_ASSIGN = 'role.assign';
 
     // Content management (Documents)
-    case DOCUMENT_ALL = 'document.*';
     case DOCUMENT_READ = 'document.read';
     case DOCUMENT_DOWNLOAD = 'document.download';
 
     // Content management (Categories & Videos)
-    case CATEGORY_ALL = 'category.*';
-    case VIDEO_ALL = 'video.*';
+    case CATEGORY_VIEW = 'category.view';
+    case CATEGORY_CREATE = 'category.create';
+    case CATEGORY_UPDATE = 'category.update';
+    case CATEGORY_DELETE = 'category.delete';
+
+    case VIDEO_VIEW = 'video.view';
+    case VIDEO_CREATE = 'video.create';
+    case VIDEO_UPDATE = 'video.update';
+    case VIDEO_DELETE = 'video.delete';
 
     // Front-end features
     case FAVORITE_ALL = 'favorite.*';

@@ -8,6 +8,7 @@ php artisan view:cache
 
 echo "Running migrations..."
 php artisan migrate --force
+php artisan db:seed --class=RolesAndPermissionsSeeder --force --no-interaction
 
 echo "Starting Supervisor..."
 exec /usr/bin/supervisord -c /etc/supervisord.conf

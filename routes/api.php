@@ -2,38 +2,33 @@
 
 declare(strict_types=1);
 
-use App\Http\Controllers\Api\Admin\UserController as AdminUserController;
-use App\Http\Controllers\Api\CategoryController;
-use App\Http\Controllers\Api\VideoController;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Customer\CategoryController as CustomerCategoryController;
+use App\Http\Controllers\Customer\ProfileController;
+use App\Http\Controllers\Customer\VideoController as CustomerVideoController;
+use App\Http\Controllers\Rest\CategoryController;
+use App\Http\Controllers\Rest\UserController;
+use App\Http\Controllers\Rest\VideoController;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')
     ->middleware(['auth:sanctum', 'can:admin.access', SetLocale::class])
     ->group(function () {
-        Route::get('/users', [AdminUserController::class, 'index']);
-        Route::get('/admins', [AdminUserController::class, 'admins']);
-        Route::post('/admins', [AdminUserController::class, 'storeAdmin']);
+        Route::get('/users', [UserController::class, 'index']);
+        Route::get('/admins', [UserController::class, 'admins']);
+        Route::post('/admins', [UserController::class, 'storeAdmin']);
         Route::patch('/users/{user}/role', [
-            AdminUserController::class,
+            UserController::class,
             'updateRole',
         ]);
 
         // Categories
-        Route::get('/categories', [CategoryController::class, 'index']);
-        Route::post('/categories', [CategoryController::class, 'store']);
-        Route::get('/categories/{category}', [CategoryController::class, 'show']);
-        Route::put('/categories/{category}', [CategoryController::class, 'update']);
-        Route::delete('/categories/{category}', [CategoryController::class, 'destroy']);
+        Route::apiResource('/categories', CategoryController::class)->whereUuid('category');
 
         // Videos
-        Route::get('/videos', [VideoController::class, 'index']);
-        Route::post('/videos', [VideoController::class, 'store']);
-        Route::get('/videos/{video}', [VideoController::class, 'show']);
-        Route::put('/videos/{video}', [VideoController::class, 'update']);
-        Route::delete('/videos/{video}', [VideoController::class, 'destroy']);
+        Route::apiResource('/videos', VideoController::class)->whereUuid('video');
+        Route::post('/videos/{video}/toggle-publish', [VideoController::class, 'togglePublish']);
     });
 
 Route::prefix('auth')
@@ -61,14 +56,24 @@ Route::prefix('auth')
         ]);
 
         Route::middleware('auth:sanctum')->group(function () {
-            Route::post('/logout', [UserController::class, 'logout']);
+            Route::post('/logout', [ProfileController::class, 'logout']);
         });
     });
 
 Route::prefix('profile')
     ->middleware(['auth:sanctum', SetLocale::class])
     ->group(function () {
-        Route::get('/', [UserController::class, 'me']);
-        Route::patch('/', [UserController::class, 'update']);
-        Route::patch('/password', [UserController::class, 'updatePassword']);
+        Route::get('/', [ProfileController::class, 'me']);
+        Route::patch('/', [ProfileController::class, 'update']);
+        Route::patch('/password', [ProfileController::class, 'updatePassword']);
     });
+
+Route::middleware(['auth:sanctum', SetLocale::class])->group(function () {
+    // Categories
+    Route::get('/categories', [CustomerCategoryController::class, 'index']);
+    Route::get('/categories/{category}', [CustomerCategoryController::class, 'show']);
+
+    // Videos
+    Route::get('/videos', [CustomerVideoController::class, 'index']);
+    Route::get('/videos/{id}', [CustomerVideoController::class, 'show']);
+});
