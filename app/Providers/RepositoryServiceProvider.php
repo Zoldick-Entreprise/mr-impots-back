@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Repositories\Contracts\CategoryRepository;
+use App\Repositories\Contracts\DocumentRepository;
 use App\Repositories\Contracts\UserRepository;
 use App\Repositories\Contracts\VideoRepository;
 use App\Repositories\Eloquent\CategoryRepositoryEloquent;
+use App\Repositories\Eloquent\DocumentRepositoryEloquent;
 use App\Repositories\Eloquent\UserRepositoryEloquent;
 use App\Repositories\Eloquent\VideoRepositoryEloquent;
 use Illuminate\Support\ServiceProvider;
@@ -33,6 +35,10 @@ final class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             VideoRepository::class,
             VideoRepositoryEloquent::class,
+        );
+        $this->app->bind(
+            DocumentRepository::class,
+            DocumentRepositoryEloquent::class,
         );
     }
 
