@@ -63,14 +63,17 @@ Route::prefix('profile')
 Route::middleware(['auth:sanctum', SetLocale::class])->group(function () {
     // Categories
     Route::apiResource('/categories', CategoryController::class)
+        ->names('customer.categories')
         ->whereUuid('category')
         ->only(['index', 'show']);
 
     // Videos
     Route::apiResource('/videos', VideoController::class)
+        ->names('customer.videos')
         ->whereUuid('video')
         ->only(['index', 'show']);
 
     // Documents
-    Route::get('/documents', [DocumentController::class, 'index']);
+    Route::get('/documents', [DocumentController::class, 'index'])
+        ->names('customer.documents');
 });
