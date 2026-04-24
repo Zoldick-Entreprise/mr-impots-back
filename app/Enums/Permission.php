@@ -26,7 +26,10 @@ enum Permission: string
     case ROLE_ASSIGN = 'role.assign';
 
     // Content management (Documents)
+    case DOCUMENT_CREATE = 'document.create';
     case DOCUMENT_READ = 'document.read';
+    case DOCUMENT_UPDATE = 'document.update';
+    case DOCUMENT_DELETE = 'document.delete';
     case DOCUMENT_DOWNLOAD = 'document.download';
 
     // Content management (Categories & Videos)

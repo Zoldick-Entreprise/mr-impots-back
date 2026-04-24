@@ -26,7 +26,9 @@ final class StoreVideoRequest extends FormRequest
     {
         return [
             'title' => ['required', 'array'],
+            'title.*' => ['required', 'string'],
             'description' => ['required', 'array'],
+            'description.*' => ['required', 'string'],
             'category_id' => ['required', 'exists:categories,id'],
             'published_at' => ['required', 'date'],
             'video' => ['required', 'file', 'mimes:mp4,mov,avi,wmv', 'max:204800'],

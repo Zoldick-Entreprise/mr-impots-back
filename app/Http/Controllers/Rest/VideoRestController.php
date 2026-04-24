@@ -14,7 +14,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Cache;
 
-final class VideoController extends Controller
+final class VideoRestController extends Controller
 {
     use AuthorizesRequests;
 

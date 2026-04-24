@@ -125,4 +125,5 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'max_pdf_size_mb' => env('MAX_PDF_SIZE_MB', 10),
 ];

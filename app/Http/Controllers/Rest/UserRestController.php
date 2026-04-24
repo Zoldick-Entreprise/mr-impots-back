@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Gate;
  * Handles administrative actions related to users, such as
  * listing normal users, listing administrators, and managing assigned roles.
  */
-final class UserController extends Controller
+final class UserRestController extends Controller
 {
     /**
      * UserController constructor.
