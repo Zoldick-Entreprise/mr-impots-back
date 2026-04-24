@@ -15,7 +15,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * Includes media URLs for the French and English PDF versions if available,
  * and lazily evaluates relationships to avoid N+1 issues.
  *
- * @mixin Document
+ * @property Document $resource
  */
 final class DocumentResource extends JsonResource
 {
@@ -27,24 +27,20 @@ final class DocumentResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
-            'title' => $this->title, // Returns the JSON array containing 'fr' and 'en'
-            'status' => $this->status,
-            'ocr_status' => $this->ocr_status,
-            'document_views' => $this->document_views,
-            'published_at' => $this->published_at,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'id' => $this->resource->id,
+            'title' => $this->resource->title,
+            'status' => $this->resource->status,
+            'ocr_status' => $this->resource->ocr_status,
+            'document_views' => $this->resource->document_views,
+            'published_at' => $this->resource->published_at,
+            'created_at' => $this->resource->created_at,
 
-            // Relationships (Loaded only if eager loaded to prevent N+1)
             'category' => new CategoryResource($this->whenLoaded('category')),
             'uploaded_by' => new UserResource($this->whenLoaded('uploadedBy')),
 
-            // Media Files (Using Spatie Media Library)
-            // Assumes media is stored on a cloud disk like R2, returning the absolute URL
             'files' => [
-                'fr' => $this->getFirstMediaUrl('document_fr') ?: null,
-                'en' => $this->getFirstMediaUrl('document_en') ?: null,
+                'fr' => $this->resource->fr_document,
+                'en' => $this->resource->en_document,
             ],
         ];
     }

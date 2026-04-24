@@ -23,9 +23,8 @@ Route::prefix('admin')
         Route::patch('/users/{user}/role', [UserRestController::class, 'updateRole']);
 
         // Categories
-        Route::apiResource('/categories', CategoryRestController::class)->whereUuid(
-            'category',
-        );
+        Route::apiResource('/categories', CategoryRestController::class)
+            ->whereUuid('category');
 
         // Videos
         Route::apiResource('/videos', VideoRestController::class)->whereUuid('video');
@@ -69,7 +68,7 @@ Route::middleware(['auth:sanctum', SetLocale::class])->group(function () {
 
     // Videos
     Route::apiResource('/videos', VideoController::class)
-        ->whereUlid('video')
+        ->whereUuid('video')
         ->only(['index', 'show']);
 
     // Documents

@@ -14,7 +14,8 @@ use Illuminate\Auth\Access\HandlesAuthorization;
  * Class DocumentPolicy
  *
  * Handles authorization for Document resources.
- * Enforces business rules: Admins have full access, Editors can only modify their own documents.
+ * Enforces business rules: Super admins have full access, and all other actions are governed by
+ * the corresponding document permissions checked by each policy method.
  */
 final class DocumentPolicy
 {
@@ -55,7 +56,7 @@ final class DocumentPolicy
      * @param  Document  $document  The Document being accessed.
      * @return bool True if the user has the required permission.
      */
-    public function view(User $user, Document $document): bool
+    public function view(User $user): bool
     {
         return $user->can(Permission::DOCUMENT_READ->value);
     }
@@ -93,5 +94,17 @@ final class DocumentPolicy
     public function delete(User $user, Document $document): bool
     {
         return $user->can(Permission::DOCUMENT_DELETE->value);
+    }
+
+    /**
+     * Determine whether the user can toggle the publish status of the model.
+     *
+     * @param  User  $user  The authenticated user.
+     * @param  Document  $document  The Document being toggled.
+     * @return bool True if the user has the required permission.
+     */
+    public function togglePublish(User $user, Document $document): bool
+    {
+        return $user->can(Permission::DOCUMENT_UPDATE->value);
     }
 }

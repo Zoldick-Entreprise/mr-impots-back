@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Translatable\HasTranslations;
 
 /**
  * Represents a category in the system.
@@ -20,21 +23,15 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read Carbon $updated_at The last update timestamp of the user.
  * @property-read Media $avatar The avatar media of the user.
  */
+#[Fillable(['parent_id', 'name', 'slug', 'icon', 'sort_order'])]
 final class Category extends Model
 {
-    use HasUuids;
+    use HasTranslations, HasUuids;
 
-    protected $keyType = 'string';
-
-    public $incrementing = false;
-
-    protected $fillable = [
-        'parent_id',
-        'name',
-        'slug',
-        'icon',
-        'sort_order',
-    ];
+    /**
+     * The attributes that are translatable.
+     */
+    protected $translatable = ['name'];
 
     protected $casts = [
         'name' => 'array',
@@ -45,17 +42,32 @@ final class Category extends Model
         return 'slug';
     }
 
+    /**
+     * Get the parent category of this category.
+     *
+     * @return BelongsTo<Category>
+     */
     public function parent()
     {
         return $this->belongsTo(Category::class, 'parent_id');
     }
 
+    /**
+     * Get the child categories of this category.
+     *
+     * @return HasMany<Category>
+     */
     public function childrens()
     {
         return $this->hasMany(Category::class, 'parent_id');
     }
 
-    public function videos()
+    /**
+     * Get the videos associated with this category.
+     *
+     * @return HasMany<Video>
+     */
+    public function videos(): HasMany
     {
         return $this->hasMany(Video::class);
     }

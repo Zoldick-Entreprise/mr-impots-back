@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Cache;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Spatie\Translatable\HasTranslations;
 
 /**
  * Represents a video in the system.
@@ -34,9 +35,21 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 // Media
 final class Video extends Model implements HasMedia
 {
-    use HasUuids, InteractsWithMedia;
+    use HasTranslations, HasUuids, InteractsWithMedia;
 
+    /**
+     * The attributes that are appended to the model's array representation.
+     *
+     * @var array
+     */
     protected $appends = ['video_url', 'thumbnail_url'];
+
+    /**
+     * The attributes that are translatable.
+     *
+     * @var array
+     */
+    protected $translatable = ['title', 'description'];
 
     protected $fillable = [
         'title',

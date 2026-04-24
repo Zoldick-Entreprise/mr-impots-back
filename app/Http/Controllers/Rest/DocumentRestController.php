@@ -16,6 +16,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -62,17 +63,19 @@ final class DocumentRestController extends Controller
                 'uploaded_by' => $request->user()->id,
             ]);
 
-            if ($request->hasFile('file_fr')) {
-                $doc->addMediaFromRequest('file_fr')->toMediaCollection(
-                    'document_fr',
-                );
-            }
+            DB::afterCommit(function () use ($request, $doc): void {
+                if ($request->hasFile('file_fr')) {
+                    $doc->addMediaFromRequest('file_fr')->toMediaCollection(
+                        'document_fr',
+                    );
+                }
 
-            if ($request->hasFile('file_en')) {
-                $doc->addMediaFromRequest('file_en')->toMediaCollection(
-                    'document_en',
-                );
-            }
+                if ($request->hasFile('file_en')) {
+                    $doc->addMediaFromRequest('file_en')->toMediaCollection(
+                        'document_en',
+                    );
+                }
+            });
 
             return $doc;
         });
@@ -127,6 +130,8 @@ final class DocumentRestController extends Controller
             ]);
             $document->clearMediaCollection('document_fr');
             $document->clearMediaCollection('document_en');
+            Cache::forget("fr_document_{$document->id}");
+            Cache::forget("en_document_{$document->id}");
         });
 
         return response()->json(null, 204);

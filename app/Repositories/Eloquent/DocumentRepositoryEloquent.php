@@ -10,7 +10,6 @@ use App\Repositories\CommonRepository;
 use App\Repositories\Contracts\DocumentRepository;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Collection;
-use Spatie\QueryBuilder\AllowedFilter;
 
 /**
  * Class DocumentRepositoryEloquent
@@ -29,26 +28,14 @@ final class DocumentRepositoryEloquent extends CommonRepository implements Docum
      */
     protected string $model = Document::class;
 
-    /**
-     * Repository configuration.
-     *
-     * @var array<string, mixed>
-     */
-    protected array $config = [
-        'includes' => ['category', 'uploadedBy'],
-        'relations' => ['category', 'uploadedBy'],
-        'sorts' => ['created_at', 'published_at'],
-    ];
-
     public function __construct(array $config = [])
     {
-        $this->config['filters'] = [
-            'status',
-            'category_id',
-            AllowedFilter::scope('language'),
-        ];
-
-        parent::__construct($config);
+        parent::__construct([
+            'includes' => ['category', 'uploadedBy'],
+            'relations' => ['category', 'uploadedBy'],
+            'sorts' => ['created_at', 'published_at'],
+            'filters' => ['status', 'category_id'],
+        ]);
     }
 
     /**
@@ -60,13 +47,7 @@ final class DocumentRepositoryEloquent extends CommonRepository implements Docum
      */
     public function getPublished(array $queries = []): Collection|Paginator
     {
-        return $this->handleMaybePaginatedQuery(
-            fn () => $this->buildQuery()->where(
-                'status',
-                DocumentStatus::Published->value,
-            ),
-            $queries,
-        );
+        return $this->handleMaybePaginatedQuery(fn () => $this->buildQuery()->published(), $queries);
     }
 
     /**
@@ -78,13 +59,13 @@ final class DocumentRepositoryEloquent extends CommonRepository implements Docum
         /** @var Document $doc */
         $doc = $this->ensureModel($document);
 
-        $isPublished = $doc->status === DocumentStatus::Published;
+        $isPublished = $doc->status === DocumentStatus::PUBLISHED;
 
         /** @var Document $updatedDoc */
         $updatedDoc = $this->update($doc, [
             'status' => $isPublished
-                ? DocumentStatus::Draft->value
-                : DocumentStatus::Published->value,
+                ? DocumentStatus::DRAFT->value
+                : DocumentStatus::PUBLISHED->value,
             'published_at' => $isPublished ? null : now(),
         ]);
 

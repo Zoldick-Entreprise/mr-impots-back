@@ -30,8 +30,7 @@ final class StoreDocumentRequest extends FormRequest
      */
     public function rules(): array
     {
-        // Convert MB to KB for Laravel's max validation rule. Default to 50MB.
-        $maxSizeKb = (int) env('MAX_PDF_SIZE_MB', 50) * 1024;
+        $maxSizeKb = (int) config('app.max_pdf_size_mb') * 1024;
 
         return [
             'title' => ['required', 'array'],

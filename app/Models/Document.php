@@ -6,17 +6,19 @@ namespace App\Models;
 
 use App\Enums\DocumentStatus;
 use App\Enums\OcrStatus;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\Translatable\HasTranslations;
+
+use function Illuminate\Support\now;
 
 /**
  * Class Document
@@ -24,37 +26,30 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * Represents a document in the system. It handles PDF files in multiple languages
  * (e.g., French and English) using Spatie Media Library, minimizing redundant DB records.
  *
- * @property string $id
- * @property array $title
- * @property string $category_id
- * @property DocumentStatus $status
- * @property OcrStatus $ocr_status
- * @property string $uploaded_by
- * @property Carbon|null $published_at
- * @property int $document_views
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
+ * @property string $id The unique identifier for the document.
+ * @property string $title The title of the document(in the specified language of the user).
+ * @property string $category_id The ID of the category to which the document belongs.
+ * @property DocumentStatus $status The status of the document.
+ * @property OcrStatus $ocr_status The OCR status of the document.
+ * @property string $uploaded_by The ID of the user who uploaded the document.
+ * @property Carbon|null $published_at The date and time the document was published.
+ * @property int $document_views The number of times the document has been viewed.
+ * @property Carbon|null $created_at The date and time the document was created.
+ * @property Carbon|null $updated_at The date and time the document was last updated.
+ * @property-read ?string $fr_document The link of the file in french.
+ * @property-read ?string $en_document The link of the file in english.
  */
+#[Fillable(['category_id', 'status', 'ocr_status', 'uploaded_by', 'published_at', 'document_views'])]
 final class Document extends Model implements HasMedia
 {
-    use HasFactory;
-    use HasUuids;
-    use InteractsWithMedia;
+    use HasFactory, HasTranslations, HasUuids, InteractsWithMedia;
 
     /**
-     * The attributes that are mass assignable.
+     * The attributes that are translatable.
      *
-     * @var array<int, string>
+     * @var array
      */
-    protected $fillable = [
-        'title',
-        'category_id',
-        'status',
-        'ocr_status',
-        'uploaded_by',
-        'published_at',
-        'document_views',
-    ];
+    protected $translatable = ['title'];
 
     /**
      * The attributes that should be cast to native types.
@@ -71,6 +66,26 @@ final class Document extends Model implements HasMedia
 
     protected $with = ['category'];
 
+    public function fr_document(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => Cache::remember('fr_document_'.$this->id,
+                ttl: fn ($url) => $url !== null ? 3570 : null,
+                callback: fn () => $this->getFirstMedia('document_fr')->getTemporaryUrl(now()->addHour()),
+            ),
+        );
+    }
+
+    public function en_document(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => Cache::remember('en_document_'.$this->id,
+                ttl: fn ($url) => $url !== null ? 3570 : null,
+                callback: fn () => $this->getFirstMedia('document_en')->getTemporaryUrl(now()->addHour()),
+            ),
+        );
+    }
+
     /**
      * Register the media collections for Spatie Media Library.
      * Restricts uploads to PDF files and ensures a single file per language collection.
@@ -79,15 +94,19 @@ final class Document extends Model implements HasMedia
     {
         $this->addMediaCollection('document_fr')
             ->acceptsMimeTypes(['application/pdf'])
+            ->useDisk('r2')
             ->singleFile();
 
         $this->addMediaCollection('document_en')
             ->acceptsMimeTypes(['application/pdf'])
+            ->useDisk('r2')
             ->singleFile();
     }
 
     /**
      * Get the category that the document belongs to.
+     *
+     * @return BelongsTo<Category>
      */
     public function category(): BelongsTo
     {
@@ -96,25 +115,18 @@ final class Document extends Model implements HasMedia
 
     /**
      * Get the user who uploaded the document.
+     *
+     * @return BelongsTo<User>
      */
     public function uploadedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'uploaded_by');
     }
 
-    /**
-     * Scope a query to only include documents available in a specific language.
-     *
-     * @param  Builder  $query  The query builder instance.
-     * @param  string  $language  The language code (e.g., 'fr', 'en').
-     */
-    public function scopeLanguage(Builder $query, string $language): Builder
-    {
-        return $query->whereNotNull("title->{$language}");
-    }
-
     // /**
     //  * Get the textual contents extracted from the document (e.g., via OCR).
+    //  *
+    //  * @return HasMany<DocumentContent>
     //  */
     // public function contents(): HasMany
     // {

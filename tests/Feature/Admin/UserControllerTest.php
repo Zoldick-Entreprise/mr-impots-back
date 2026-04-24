@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature\Admin;
 
 use App\Enums\DefaultRole;
+use App\Enums\Permission;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -40,6 +41,7 @@ final class UserControllerTest extends TestCase
     {
         $admin = User::factory()->create();
         $admin->assignRole(DefaultRole::ADMIN);
+        $admin->givePermissionTo(Permission::USER_VIEW);
 
         $normalUser = User::factory()->create();
         $normalUser->assignRole('user');
@@ -57,6 +59,7 @@ final class UserControllerTest extends TestCase
     {
         $admin = User::factory()->create();
         $admin->assignRole(DefaultRole::ADMIN);
+        $admin->givePermissionTo(Permission::USER_VIEW);
 
         $otherAdmin = User::factory()->create();
         $otherAdmin->assignRole(DefaultRole::ADMIN);
