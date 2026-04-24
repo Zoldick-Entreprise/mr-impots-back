@@ -75,5 +75,5 @@ Route::middleware(['auth:sanctum', SetLocale::class])->group(function () {
 
     // Documents
     Route::get('/documents', [DocumentController::class, 'index'])
-        ->names('customer.documents');
+        ->name('customer.documents');
 });
