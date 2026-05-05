@@ -32,6 +32,7 @@ Route::prefix('admin')
 
         // Documents
         Route::apiResource('/documents', DocumentRestController::class)->whereUuid('document');
+        Route::post('/documents/{document}/upload', [DocumentRestController::class, 'upload']);
         Route::post('/documents/{document}/toggle-publish', [DocumentRestController::class, 'togglePublish']);
     });
 
@@ -39,13 +40,25 @@ Route::prefix('auth')
     ->middleware([SetLocale::class])
     ->group(function () {
         Route::prefix('/google')->group(function () {
-            Route::get('/redirect', [AuthController::class, 'redirectToGoogle']);
-            Route::get('/callback', [AuthController::class, 'handleGoogleCallback']);
+            Route::get('/redirect', [
+                AuthController::class,
+                'redirectToGoogle',
+            ]);
+            Route::get('/callback', [
+                AuthController::class,
+                'handleGoogleCallback',
+            ]);
         });
         Route::post('/register', [AuthController::class, 'register']);
         Route::post('/login', [AuthController::class, 'login']);
-        Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
-        Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+        Route::post('/forgot-password', [
+            AuthController::class,
+            'forgotPassword',
+        ]);
+        Route::post('/reset-password', [
+            AuthController::class,
+            'resetPassword',
+        ]);
 
         Route::middleware('auth:sanctum')->group(function () {
             Route::post('/logout', [ProfileController::class, 'logout']);
@@ -74,6 +87,7 @@ Route::middleware(['auth:sanctum', SetLocale::class])->group(function () {
         ->only(['index', 'show']);
 
     // Documents
-    Route::get('/documents', [DocumentController::class, 'index'])
-        ->name('customer.documents');
+    Route::get('/documents', [DocumentController::class, 'index'])->name(
+        'customer.documents',
+    );
 });

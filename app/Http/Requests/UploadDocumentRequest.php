@@ -7,11 +7,11 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * Class StoreDocumentRequest
+ * Class UploadDocumentRequest
  *
- * Handles validation for creating a new Document and translatable title.
+ * Handles validation for uploading PDF files for a Document (FR/EN)
  */
-final class StoreDocumentRequest extends FormRequest
+final class UploadDocumentRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -29,11 +29,11 @@ final class StoreDocumentRequest extends FormRequest
      */
     public function rules(): array
     {
+        $maxSizeKb = (int) config('app.max_pdf_size_mb') * 1024;
+
         return [
-            'title' => ['required', 'array'],
-            'title.fr' => ['required', 'string', 'max:255'],
-            'title.en' => ['required', 'string', 'max:255'],
-            'category_id' => ['required', 'uuid', 'exists:categories,id'],
+            'file_fr' => ['file', 'mimes:pdf', 'max:'.$maxSizeKb],
+            'file_en' => ['file', 'mimes:pdf', 'max:'.$maxSizeKb],
         ];
     }
 

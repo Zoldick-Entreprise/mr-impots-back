@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Spatie\MediaLibrary\HasMedia;
@@ -39,7 +40,17 @@ use function Illuminate\Support\now;
  * @property-read ?string $fr_document The link of the file in french.
  * @property-read ?string $en_document The link of the file in english.
  */
-#[Fillable(['category_id', 'status', 'ocr_status', 'uploaded_by', 'published_at', 'document_views'])]
+#[
+    Fillable([
+        'category_id',
+        'status',
+        'ocr_status',
+        'uploaded_by',
+        'published_at',
+        'document_views',
+        'title',
+    ]),
+]
 final class Document extends Model implements HasMedia
 {
     use HasFactory, HasTranslations, HasUuids, InteractsWithMedia;
@@ -66,22 +77,28 @@ final class Document extends Model implements HasMedia
 
     protected $with = ['category'];
 
-    public function fr_document(): Attribute
+    public function frDocument(): Attribute
     {
         return Attribute::make(
-            get: fn () => Cache::remember('fr_document_'.$this->id,
+            get: fn () => Cache::remember(
+                'fr_document_'.$this->id,
                 ttl: fn ($url) => $url !== null ? 3570 : null,
-                callback: fn () => $this->getFirstMedia('document_fr')->getTemporaryUrl(now()->addHour()),
+                callback: fn () => $this->getFirstMedia(
+                    'document_fr',
+                )?->getTemporaryUrl(now()->addHour()),
             ),
         );
     }
 
-    public function en_document(): Attribute
+    public function enDocument(): Attribute
     {
         return Attribute::make(
-            get: fn () => Cache::remember('en_document_'.$this->id,
+            get: fn () => Cache::remember(
+                'en_document_'.$this->id,
                 ttl: fn ($url) => $url !== null ? 3570 : null,
-                callback: fn () => $this->getFirstMedia('document_en')->getTemporaryUrl(now()->addHour()),
+                callback: fn () => $this->getFirstMedia(
+                    'document_en',
+                )?->getTemporaryUrl(now()->addHour()),
             ),
         );
     }
@@ -123,23 +140,25 @@ final class Document extends Model implements HasMedia
         return $this->belongsTo(User::class, 'uploaded_by');
     }
 
-    // /**
-    //  * Get the textual contents extracted from the document (e.g., via OCR).
-    //  *
-    //  * @return HasMany<DocumentContent>
-    //  */
-    // public function contents(): HasMany
-    // {
-    //     return $this->hasMany(DocumentContent::class);
-    // }
+    /**
+     * Get the textual contents extracted from the document (e.g., via OCR).
+     *
+     * @return HasMany<DocumentPage>
+     */
+    public function pages(): HasMany
+    {
+        return $this->hasMany(DocumentPage::class);
+    }
 
-    // /**
-    //  * Get the related OCR Job processing this document.
-    //  */
-    // public function ocrJob(): HasOne
-    // {
-    //     return $this->hasOne(OcrJob::class);
-    // }
+    /**
+     * Get the related OCR Jobs processing this document (one per locale).
+     *
+     * @return HasMany<OcrJob>
+     */
+    public function ocrJobs(): HasMany
+    {
+        return $this->hasMany(OcrJob::class);
+    }
 
     // /**
     //  * Get the tags associated with the document.

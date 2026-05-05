@@ -9,7 +9,9 @@ use App\Enums\OcrStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreDocumentRequest;
 use App\Http\Requests\UpdateDocumentRequest;
+use App\Http\Requests\UploadDocumentRequest;
 use App\Http\Resources\DocumentResource;
+use App\Jobs\ProcessDocumentOcr;
 use App\Models\Document;
 use App\Repositories\Contracts\DocumentRepository;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -56,26 +58,11 @@ final class DocumentRestController extends Controller
         $document = DB::transaction(function () use ($request) {
             /** @var Document $doc */
             $doc = $this->repository->create([
-                'title' => $request->validated('title'),
-                'category_id' => $request->validated('category_id'),
+                ...$request->validated(),
                 'status' => DocumentStatus::DRAFT->value,
                 'ocr_status' => OcrStatus::PENDING->value,
                 'uploaded_by' => $request->user()->id,
             ]);
-
-            DB::afterCommit(function () use ($request, $doc): void {
-                if ($request->hasFile('file_fr')) {
-                    $doc->addMediaFromRequest('file_fr')->toMediaCollection(
-                        'document_fr',
-                    );
-                }
-
-                if ($request->hasFile('file_en')) {
-                    $doc->addMediaFromRequest('file_en')->toMediaCollection(
-                        'document_en',
-                    );
-                }
-            });
 
             return $doc;
         });
@@ -83,6 +70,30 @@ final class DocumentRestController extends Controller
         return DocumentResource::make(
             $document->load(['uploadedBy']),
         )->response();
+    }
+
+    /**
+     * Upload PDF files for the specified document.
+     */
+    public function upload(UploadDocumentRequest $request, Document $document): JsonResponse
+    {
+        $this->authorize('create', $document);
+
+        if ($request->hasFile('file_fr')) {
+            $document->addMediaFromRequest('file_fr')->toMediaCollection(
+                'document_fr',
+            );
+            ProcessDocumentOcr::dispatch($document->id, 'fr');
+        }
+
+        if ($request->hasFile('file_en')) {
+            $document->addMediaFromRequest('file_en')->toMediaCollection(
+                'document_en',
+            );
+            ProcessDocumentOcr::dispatch($document->id, 'en');
+        }
+
+        return $this->successResponse();
     }
 
     /**
@@ -149,5 +160,19 @@ final class DocumentRestController extends Controller
         return DocumentResource::make(
             $updatedDocument->load(['uploadedBy']),
         )->response();
+    }
+
+    /**
+     * Display the OCR Jobs associated with the document.
+     */
+    public function ocrJobs(Document $document): JsonResponse
+    {
+        $this->authorize('view', $document);
+
+        $jobs = $document->ocrJobs()->latest()->get();
+
+        return response()->json([
+            'data' => $jobs,
+        ]);
     }
 }

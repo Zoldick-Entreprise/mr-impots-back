@@ -11,8 +11,23 @@ namespace App\Enums;
  */
 enum OcrStatus: string
 {
-    case PENDING = 'pending';
-    case PROCESSING = 'processing';
-    case COMPLETED = 'completed';
-    case FAILED = 'failed';
+    /**
+     * OCR processing has not started yet.
+     */
+    case PENDING = 'ocrs_pending';
+
+    /**
+     * OCR processing is currently in progress.
+     */
+    case PROCESSING = 'ocrs_processing';
+
+    /**
+     * OCR processing has completed successfully.
+     */
+    case COMPLETED = 'ocrs_completed';
+
+    /**
+     * OCR processing has failed.
+     */
+    case FAILED = 'ocrs_failed';
 }
