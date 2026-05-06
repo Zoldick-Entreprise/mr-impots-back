@@ -7,7 +7,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-final class CategoryResource extends JsonResource
+final class AdminCategoryResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -20,7 +20,7 @@ final class CategoryResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'slug' => $this->slug,
-            'childrens' => CategoryResource::collection($this->whenLoaded('childrens')),
+            'childrens' => AdminCategoryResource::collection($this->whenLoaded('childrens')),
         ];
     }
 }
