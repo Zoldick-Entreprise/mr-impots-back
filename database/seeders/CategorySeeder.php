@@ -19,7 +19,7 @@ final class CategorySeeder extends Seeder
             'name' => ['fr' => 'Droit', 'en' => 'Law'],
             'slug' => 'droit',
             'parent_id' => null,
-            ]);
+        ]);
 
         // sous-catégories pour droit
         Category::create([
