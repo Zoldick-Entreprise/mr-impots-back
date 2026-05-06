@@ -7,7 +7,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Translatable\HasTranslations;
 
 /**
@@ -23,7 +26,7 @@ use Spatie\Translatable\HasTranslations;
  * @property-read Carbon $updated_at The last update timestamp of the user.
  * @property-read Media $avatar The avatar media of the user.
  */
-#[Fillable(['parent_id', 'name', 'slug', 'icon', 'sort_order'])]
+#[Fillable(['parent_id', 'name', 'slug', 'icon'])]
 final class Category extends Model
 {
     use HasTranslations, HasUuids;

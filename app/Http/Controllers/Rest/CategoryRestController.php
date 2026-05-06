@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Rest;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreCategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
+use App\Http\Resources\AdminCategoryResource;
 use App\Http\Resources\CategoryResource;
 use App\Models\Category;
 use App\Repositories\Contracts\CategoryRepository;
@@ -30,7 +31,7 @@ final class CategoryRestController extends Controller
     {
         $this->authorize('viewAny', Category::class);
 
-        return CategoryResource::collection($this->categoryRepository->all());
+        return CategoryResource::collection($this->categoryRepository->getRootCategoriesWithChildrens());
     }
 
     /**
@@ -40,9 +41,13 @@ final class CategoryRestController extends Controller
     {
         $this->authorize('create', Category::class);
 
-        $category = $this->categoryRepository->create($request->validated());
+        $category = $this->categoryRepository->create($request->only(['name', 'slug']));
 
-        return new CategoryResource($category)->response()->setStatusCode(201);
+        if ($request->has('childrens')) {
+            $category->childrens()->createMany($request->childrens);
+        }
+
+        return new AdminCategoryResource($category->load('childrens'))->response()->setStatusCode(201);
     }
 
     /**
@@ -54,7 +59,7 @@ final class CategoryRestController extends Controller
 
         $this->authorize('view', $category);
 
-        return new CategoryResource($category->load('childrens'))->response();
+        return new AdminCategoryResource($category->load('childrens'))->response();
     }
 
     /**
@@ -71,7 +76,7 @@ final class CategoryRestController extends Controller
             $request->validated(),
         );
 
-        return new CategoryResource($category)->response();
+        return new AdminCategoryResource($category)->response();
     }
 
     /**

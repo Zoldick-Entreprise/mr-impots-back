@@ -29,7 +29,7 @@ final class CategoryRepositoryEloquent extends CommonRepository implements Categ
     /**
      * Default sort order for the query builder.
      */
-    protected string $defaultSort = '-sort_order';
+    protected string $defaultSort = '-created_at';
 
     /**
      * CategoryRepository constructor.
@@ -53,7 +53,6 @@ final class CategoryRepositoryEloquent extends CommonRepository implements Categ
         return $this->buildQuery()
             ->with('childrens')
             ->whereNull('parent_id')
-            ->orderBy('sort_order')
             ->get();
     }
 }
