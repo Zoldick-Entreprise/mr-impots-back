@@ -36,9 +36,6 @@ final class CategoryTest extends TestCase
         $payload = [
             'name' => ['fr' => 'Justice', 'en' => 'Justice'],
             'slug' => 'justice',
-            'icon' => 'fa-balance-scale',
-            'parent_id' => null,
-            'sort_order' => 3,
         ];
 
         $response = $this->actingAs($admin, 'sanctum')->postJson(

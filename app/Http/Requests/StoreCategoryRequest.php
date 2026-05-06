@@ -26,9 +26,14 @@ final class StoreCategoryRequest extends FormRequest
     {
         return [
             'name' => ['required', 'array'],
+            'name.fr' => ['required', 'string'],
+            'name.en' => ['required', 'string'],
             'slug' => ['required', 'string', 'unique:categories,slug'],
-            'parent_id' => ['nullable', 'exists:categories,id'],
-            'sort_order' => ['required', 'integer'],
+            'childrens' => ['nullable', 'array', 'unique_in_array:slug'],
+            'childrens.*.slug' => ['required', 'string', 'unique:categories,slug'],
+            'childrens.*.name' => ['required', 'array'],
+            'childrens.*.name.fr' => ['required', 'string'],
+            'childrens.*.name.en' => ['required', 'string'],
         ];
     }
 }
