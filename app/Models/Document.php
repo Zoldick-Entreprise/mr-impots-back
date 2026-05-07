@@ -29,6 +29,7 @@ use function Illuminate\Support\now;
  *
  * @property string $id The unique identifier for the document.
  * @property string $title The title of the document(in the specified language of the user).
+ * @property string $description The description of the document.
  * @property string $category_id The ID of the category to which the document belongs.
  * @property DocumentStatus $status The status of the document.
  * @property OcrStatus $ocr_status The OCR status of the document.
@@ -49,6 +50,7 @@ use function Illuminate\Support\now;
         'published_at',
         'document_views',
         'title',
+        'description',
     ]),
 ]
 final class Document extends Model implements HasMedia
@@ -60,7 +62,7 @@ final class Document extends Model implements HasMedia
      *
      * @var array
      */
-    protected $translatable = ['title'];
+    protected $translatable = ['title', 'description'];
 
     /**
      * The attributes that should be cast to native types.
@@ -69,6 +71,7 @@ final class Document extends Model implements HasMedia
      */
     protected $casts = [
         'title' => 'array',
+        'description' => 'array',
         'published_at' => 'datetime',
         'document_views' => 'integer',
         'status' => DocumentStatus::class,

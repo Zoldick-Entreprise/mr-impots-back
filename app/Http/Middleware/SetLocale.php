@@ -27,7 +27,13 @@ final class SetLocale
         if ($user && $user->preferred_language) {
             $lang = ($user->preferred_language);
         } elseif ($request->hasHeader('Accept-Language')) {
-            $lang = $request->getPreferredLanguage(['en', 'fr']);
+            $lang = $request->header('Accept-Language');
+            if ($lang) {
+                $lang = substr($lang, 0, 2);
+                if (! \in_array($lang, ['en', 'fr'], true)) {
+                    $lang = 'en';
+                }
+            }
         }
 
         App::setLocale($lang);

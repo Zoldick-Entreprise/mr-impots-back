@@ -33,6 +33,9 @@ final class StoreDocumentRequest extends FormRequest
             'title' => ['required', 'array'],
             'title.fr' => ['required', 'string', 'max:255'],
             'title.en' => ['required', 'string', 'max:255'],
+            'description' => ['required', 'array'],
+            'description.fr' => ['required', 'string', 'max:255'],
+            'description.en' => ['required', 'string', 'max:255'],
             'category_id' => ['required', 'uuid', 'exists:categories,id'],
         ];
     }
