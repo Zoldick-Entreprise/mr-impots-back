@@ -35,6 +35,9 @@ final class UpdateDocumentRequest extends FormRequest
             'title' => ['sometimes', 'array'],
             'title.fr' => ['sometimes', 'string', 'max:255'],
             'title.en' => ['sometimes', 'string', 'max:255'],
+            'description' => ['sometimes', 'array'],
+            'description.fr' => ['sometimes', 'string', 'max:255'],
+            'description.en' => ['sometimes', 'string', 'max:255'],
             'category_id' => ['sometimes', 'uuid', 'exists:categories,id'],
         ];
     }

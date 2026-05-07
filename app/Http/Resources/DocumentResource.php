@@ -29,8 +29,8 @@ final class DocumentResource extends JsonResource
         return [
             'id' => $this->resource->id,
             'title' => $this->resource->title,
+            'description' => $this->resource->description,
             'status' => $this->resource->status,
-            'ocr_status' => $this->resource->ocr_status,
             'document_views' => $this->resource->document_views,
             'published_at' => $this->resource->published_at,
             'created_at' => $this->resource->created_at,

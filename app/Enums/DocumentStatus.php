@@ -11,7 +11,7 @@ namespace App\Enums;
  */
 enum DocumentStatus: string
 {
-    case DRAFT = 'draft';
-    case PUBLISHED = 'published';
-    case ARCHIVED = 'archived';
+    case DRAFT = 'ds_draft';
+    case PUBLISHED = 'ds_published';
+    case ARCHIVED = 'ds_archived';
 }
