@@ -38,6 +38,11 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
 # PHP production configuration
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
+# Override default upload limits
+RUN echo "upload_max_filesize = 25M" >> $PHP_INI_DIR/conf.d/uploads.ini \
+    && echo "post_max_size = 30M" >> $PHP_INI_DIR/conf.d/uploads.ini \
+    && echo "memory_limit = 256M" >> $PHP_INI_DIR/conf.d/uploads.ini
+
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
