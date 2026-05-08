@@ -11,12 +11,18 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Enable pgvector extension if not exists
-        DB::statement('CREATE EXTENSION IF NOT EXISTS vector;');
+        // Enable pgvector extension if not exists (only for PostgreSQL)
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('CREATE EXTENSION IF NOT EXISTS vector;');
+        }
 
         Schema::table('document_pages', function (Blueprint $table) {
             // Using dimension 1536 (standard for OpenAI/many models)
-            $table->vector('embedding', 1536)->nullable()->after('content');
+            if (DB::getDriverName() === 'pgsql') {
+                $table->vector('embedding', 1536)->nullable()->after('content');
+            } else {
+                $table->text('embedding')->nullable()->after('content');
+            }
         });
     }
 
