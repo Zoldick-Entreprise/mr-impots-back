@@ -4,6 +4,7 @@ FROM php:8.4-fpm-alpine
 RUN apk update && apk add --no-cache \
     nginx \
     supervisor \
+    redis \
     postgresql-dev \
     libzip-dev \
     icu-dev \
