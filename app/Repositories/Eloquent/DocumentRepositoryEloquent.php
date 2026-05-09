@@ -71,4 +71,12 @@ final class DocumentRepositoryEloquent extends CommonRepository implements Docum
 
         return $updatedDoc;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getNonArchived(array $queries = []): Collection|Paginator
+    {
+        return $this->handleMaybePaginatedQuery(fn () => $this->buildQuery()->notDeleted(), $queries);
+    }
 }

@@ -24,15 +24,22 @@ final class SetLocale
 
         $lang = config('app.locale');
 
-        if ($user && $user->preferred_language) {
-            $lang = ($user->preferred_language);
-        } elseif ($request->hasHeader('Accept-Language')) {
+        if ($request->hasHeader('Accept-Language')) {
             $lang = $request->header('Accept-Language');
-            if ($lang) {
-                $lang = substr($lang, 0, 2);
-                if (! \in_array($lang, ['en', 'fr'], true)) {
-                    $lang = 'en';
-                }
+            $lang = substr($lang, 0, 2);
+
+            if (! \in_array($lang, ['en', 'fr'], true)) {
+                $lang = 'en';
+            }
+
+            if ($user && $user->preferred_language !== $lang) {
+                $user->update(['preferred_language' => $lang]);
+            }
+        } else {
+            if ($user) {
+                $lang = $user->preferred_language;
+            } else {
+                $lang = 'fr';
             }
         }
 

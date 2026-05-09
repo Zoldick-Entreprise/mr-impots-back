@@ -88,6 +88,12 @@ Route::middleware(['auth:sanctum', SetLocale::class])->group(function () {
 
     // Documents
     Route::get('/documents', [DocumentController::class, 'index'])->name(
-        'customer.documents',
+        'customer.documents.index',
     );
+    Route::get('/documents/{document}/pages', [DocumentController::class, 'getPages'])
+        ->name('customer.documents.pages')
+        ->whereUuid('document');
+    Route::get('/documents/{document}', [DocumentController::class, 'show'])
+        ->name('customer.documents.show')
+        ->whereUuid('document');
 });

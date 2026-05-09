@@ -41,9 +41,10 @@ final class CategoryTest extends TestCase
         $response = $this->actingAs($admin, 'sanctum')->postJson(
             '/api/admin/categories',
             $payload,
+            ['Accept-Language' => 'fr'],
         );
 
-        $response->assertCreated()->assertJsonPath('data.name', 'Justice');
+        $response->assertCreated()->assertJsonPath('data.name', ['fr' => 'Justice', 'en' => 'Justice']);
 
         $this->assertDatabaseHas('categories', [
             'slug' => 'justice',

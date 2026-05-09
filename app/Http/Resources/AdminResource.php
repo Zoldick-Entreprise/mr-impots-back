@@ -30,6 +30,7 @@ final class AdminResource extends JsonResource
             'email' => $this->resource->email,
             'avatar' => $this->resource->avatar,
             'roles' => $this->whenLoaded('roles'),
+            'preferred_language' => $this->resource->preferred_language,
             'permissions' => $this->whenLoaded('permissions'),
             'created_at' => $this->created_at,
         ];
