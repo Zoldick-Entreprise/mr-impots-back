@@ -62,6 +62,7 @@ final class UserTest extends TestCase
                 'password' => 'new_password',
                 'password_confirmation' => 'new_password',
             ],
+            ['Accept-Language' => 'fr']
         );
 
         $response->assertStatus(422);

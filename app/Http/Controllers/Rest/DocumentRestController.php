@@ -45,7 +45,7 @@ final class DocumentRestController extends Controller
             'paginate' => $request->query('per_page', 20),
         ]);
 
-        return DocumentResource::collection($this->repository->all($queries));
+        return DocumentResource::collection($this->repository->getNonArchived($queries));
     }
 
     /**

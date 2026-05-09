@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace App\Http\Resources;
 
-use App\Models\Category;
+use App\Models\DocumentPage;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @property Category $resource
+ * Resource for a document page.
+ *
+ * @property-read DocumentPage $resource
  */
-final class AdminCategoryResource extends JsonResource
+final class DocumentPageResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -22,9 +24,8 @@ final class AdminCategoryResource extends JsonResource
     {
         return [
             'id' => $this->resource->id,
-            'name' => $this->resource->getTranslations('name'),
-            'slug' => $this->resource->slug,
-            'childrens' => AdminCategoryResource::collection($this->whenLoaded('childrens')),
+            'page_number' => $this->resource->page_number,
+            'content' => $this->resource->content,
         ];
     }
 }
