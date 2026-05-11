@@ -30,9 +30,11 @@ final class HorizonServiceProvider extends HorizonApplicationServiceProvider
     protected function gate(): void
     {
         Gate::define('viewHorizon', function ($user = null) {
-            return in_array(optional($user)->email, [
-                //
-            ]);
+
+            $isLocal = $this->app->environment('local');
+            $isStaging = $this->app->environment('staging');
+
+            return $isLocal || $isStaging;
         });
     }
 }

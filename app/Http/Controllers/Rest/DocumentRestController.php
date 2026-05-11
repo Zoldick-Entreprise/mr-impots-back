@@ -77,7 +77,7 @@ final class DocumentRestController extends Controller
      */
     public function upload(UploadDocumentRequest $request, Document $document): JsonResponse
     {
-        $this->authorize('create', $document);
+        $this->authorize('update', $document);
 
         if ($request->hasFile('file_fr')) {
             $document->addMediaFromRequest('file_fr')->toMediaCollection(
@@ -93,7 +93,9 @@ final class DocumentRestController extends Controller
             ProcessDocumentOcr::dispatch($document->id, 'en');
         }
 
-        return $this->successResponse();
+        $document->refresh();
+
+        return DocumentResource::make($document)->response();
     }
 
     /**
