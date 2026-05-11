@@ -42,6 +42,8 @@ use function Illuminate\Support\now;
  * @property Carbon|null $updated_at The date and time the document was last updated.
  * @property-read ?string $fr_document The link of the file in french.
  * @property-read ?string $en_document The link of the file in english.
+ * @property-read string $title_fr The title of the document in french.
+ * @property-read string $title_en The title of the document in english.
  */
 #[
     Fillable([
@@ -105,6 +107,20 @@ final class Document extends Model implements HasMedia
                     'document_en',
                 )?->getTemporaryUrl(now()->addHour()),
             ),
+        );
+    }
+
+    public function titleFr(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->getTranslations('title', ['fr']),
+        );
+    }
+
+    public function titleEn(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->getTranslations('title', ['en']),
         );
     }
 

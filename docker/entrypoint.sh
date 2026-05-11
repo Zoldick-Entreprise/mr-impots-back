@@ -9,5 +9,8 @@ php artisan view:cache
 echo "Running migrations..."
 php artisan migrate --force
 
+echo "Seeding database..."
+php artisan db:seed --force
+
 echo "Starting Supervisor..."
 exec /usr/bin/supervisord -c /etc/supervisord.conf
