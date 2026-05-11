@@ -18,7 +18,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => [env('FRONTEND_URL'), env('ADMIN_URL'), 'http://localhost'],
+    'allowed_origins' => [env('FRONTEND_URL'), env('ADMIN_URL'), 'http://localhost:300/', 'http://localhost/'],
 
     'allowed_origins_patterns' => [],
 

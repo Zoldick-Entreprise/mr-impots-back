@@ -10,6 +10,7 @@ use App\Repositories\CommonRepository;
 use App\Repositories\Contracts\DocumentRepository;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Collection;
+use Spatie\QueryBuilder\AllowedFilter;
 
 /**
  * Class DocumentRepositoryEloquent
@@ -23,6 +24,7 @@ final class DocumentRepositoryEloquent extends CommonRepository implements Docum
 {
     /**
      * The Eloquent model representing the Document.
+     *ors
      *
      * @var class-string<Document>
      */
@@ -34,7 +36,14 @@ final class DocumentRepositoryEloquent extends CommonRepository implements Docum
             'includes' => ['category', 'uploadedBy'],
             'relations' => ['category', 'uploadedBy'],
             'sorts' => ['created_at', 'published_at'],
-            'filters' => ['status', 'category_id'],
+            'filters' => [
+                'status',
+                'category_id',
+                AllowedFilter::callback('category', fn ($query, $value) => $query->whereRelation('category', function ($query) use ($value) {
+                    $query->where('slug', $value)
+                        ->orWhere('id', $value);
+                })),
+            ],
         ]);
     }
 
