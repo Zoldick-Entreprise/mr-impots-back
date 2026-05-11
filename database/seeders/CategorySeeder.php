@@ -15,20 +15,20 @@ final class CategorySeeder extends Seeder
     public function run(): void
     {
         // principal categories
-        $droit = Category::create([
+        $droit = Category::firstOrCreate([
             'name' => ['fr' => 'Droit', 'en' => 'Law'],
             'slug' => 'droit',
             'parent_id' => null,
         ]);
 
         // sous-catégories pour droit
-        Category::create([
+        Category::firstOrCreate([
             'name' => ['fr' => 'Droit Privé', 'en' => 'Private Law'],
             'slug' => 'droit-prive',
             'parent_id' => $droit->id,
         ]);
 
-        Category::create([
+        Category::firstOrCreate([
             'name' => ['fr' => 'Droit Civil', 'en' => 'Civil Law'],
             'slug' => 'droit-civil',
             'parent_id' => $droit->id,
