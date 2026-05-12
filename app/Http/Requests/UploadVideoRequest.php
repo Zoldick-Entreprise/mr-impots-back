@@ -7,7 +7,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-final class StoreVideoRequest extends FormRequest
+final class UploadVideoRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,11 +25,7 @@ final class StoreVideoRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => ['required', 'array'],
-            'title.*' => ['required', 'string'],
-            'description' => ['required', 'array'],
-            'description.*' => ['required', 'string'],
-            'category_id' => ['required', 'exists:categories,id'],
+            'video' => ['required', 'file', 'mimes:mp4,mov,avi,wmv', 'max:204800'],
         ];
     }
 }

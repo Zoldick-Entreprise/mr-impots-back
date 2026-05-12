@@ -7,12 +7,14 @@ namespace App\Http\Controllers\Rest;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreVideoRequest;
 use App\Http\Requests\UpdateVideoRequest;
+use App\Http\Requests\UploadVideoRequest;
 use App\Http\Resources\VideoResource;
 use App\Models\Video;
 use App\Repositories\Contracts\VideoRepository;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Cache;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 final class VideoRestController extends Controller
 {
@@ -41,15 +43,26 @@ final class VideoRestController extends Controller
 
         $video = $this->videoRepository->create($request->validated());
 
+        return VideoResource::make($video)->response()->setStatusCode(201);
+    }
+
+    /**
+     * Upload video for the specified video model.
+     */
+    public function upload(UploadVideoRequest $request, Video $video): JsonResponse
+    {
+        $this->authorize('update', $video);
+
         if ($request->hasFile('video')) {
             $video
                 ->addMedia($request->file('video'))
                 ->toMediaCollection('video');
 
-            $video->unsetRelation('media');
+            Cache::forget("thumbnail_url_{$video->id}");
+            Cache::forget("video_url_{$video->id}");
         }
 
-        return VideoResource::make($video)->response()->setStatusCode(201);
+        return VideoResource::make($video)->response()->setStatusCode(200);
     }
 
     /**
@@ -74,14 +87,6 @@ final class VideoRestController extends Controller
         $this->authorize('update', $model);
 
         $model = $this->videoRepository->update($model, $request->validated());
-
-        if ($request->hasFile('video')) {
-            $model->addMedia($request->file('video'))
-                ->toMediaCollection('video');
-
-            Cache::forget("thumbnail_url_{$model->id}");
-            Cache::forget("video_url_{$model->id}");
-        }
 
         return VideoResource::make($model)->response();
     }

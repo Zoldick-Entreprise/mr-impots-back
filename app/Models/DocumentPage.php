@@ -11,6 +11,16 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Laravel\Scout\Searchable;
 
+/**
+ * Represents a page of a document, including its content and embedding.
+ *
+ * @property string $id The unique identifier of the page.
+ * @property int $document_id The ID of the document this page belongs to.
+ * @property string $locale The language of the page.
+ * @property int $page_number The page number of the page.
+ * @property string $content The content of the page.
+ * @property array|null $embedding The embedding of the page.
+ */
 #[Fillable(['document_id', 'locale', 'page_number', 'content', 'embedding'])]
 final class DocumentPage extends Model
 {
@@ -28,12 +38,24 @@ final class DocumentPage extends Model
      */
     public function toSearchableArray(): array
     {
+        $this->loadMissing(['document.category']);
+
+        $documentTitle = '';
+        if ($this->document) {
+            $fr = $this->document->getTranslation('title', 'fr', false);
+            $en = $this->document->getTranslation('title', 'en', false);
+            $documentTitle = trim(($fr ?? '').' '.($en ?? ''));
+        }
+
         return [
             'id' => $this->id,
             'document_id' => $this->document_id,
             'locale' => $this->locale,
             'page_number' => $this->page_number,
             'content' => $this->content,
+            'document_title' => $documentTitle,
+            'category' => $this->document?->category?->slug,
+            'published_at' => $this->document?->published_at?->timestamp,
         ];
     }
 }

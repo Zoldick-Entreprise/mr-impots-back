@@ -11,6 +11,7 @@ use App\Http\Controllers\Rest\CategoryRestController;
 use App\Http\Controllers\Rest\DocumentRestController;
 use App\Http\Controllers\Rest\UserRestController;
 use App\Http\Controllers\Rest\VideoRestController;
+use App\Http\Controllers\SearchController;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Support\Facades\Route;
 
@@ -28,6 +29,7 @@ Route::prefix('admin')
 
         // Videos
         Route::apiResource('/videos', VideoRestController::class)->whereUuid('video');
+        Route::post('/videos/{video}/upload', [VideoRestController::class, 'upload']);
         Route::post('/videos/{video}/toggle-publish', [VideoRestController::class, 'togglePublish']);
 
         // Documents
@@ -73,27 +75,33 @@ Route::prefix('profile')
         Route::patch('/password', [ProfileController::class, 'updatePassword']);
     });
 
-Route::middleware(['auth:sanctum', SetLocale::class])->group(function () {
+Route::middleware([SetLocale::class])->group(function () {
     // Categories
     Route::apiResource('/categories', CategoryController::class)
         ->names('customer.categories')
         ->whereUuid('category')
         ->only(['index', 'show']);
 
-    // Videos
-    Route::apiResource('/videos', VideoController::class)
-        ->names('customer.videos')
-        ->whereUuid('video')
-        ->only(['index', 'show']);
+    Route::middleware(['auth:sanctum'])->group(function () {
+        // Videos
+        Route::apiResource('/videos', VideoController::class)
+            ->names('customer.videos')
+            ->whereUuid('video')
+            ->only(['index', 'show']);
 
-    // Documents
-    Route::get('/documents', [DocumentController::class, 'index'])->name(
-        'customer.documents.index',
-    );
-    Route::get('/documents/{document}/pages', [DocumentController::class, 'getPages'])
-        ->name('customer.documents.pages')
-        ->whereUuid('document');
-    Route::get('/documents/{document}', [DocumentController::class, 'show'])
-        ->name('customer.documents.show')
-        ->whereUuid('document');
+        // Documents
+        Route::get('/documents', [DocumentController::class, 'index'])->name(
+            'customer.documents.index',
+        );
+        Route::get('/documents/{document}/pages', [DocumentController::class, 'getPages'])
+            ->name('customer.documents.pages')
+            ->whereUuid('document');
+        Route::get('/documents/{document}', [DocumentController::class, 'show'])
+            ->name('customer.documents.show')
+            ->whereUuid('document');
+
+        // Search
+        Route::get('/search', [SearchController::class, 'search'])->name('customer.search');
+        Route::get('/search/recent', [SearchController::class, 'recentsSearch'])->name('customer.search.recent');
+    });
 });
