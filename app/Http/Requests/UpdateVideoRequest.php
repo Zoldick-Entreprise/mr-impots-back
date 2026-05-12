@@ -28,7 +28,6 @@ final class UpdateVideoRequest extends FormRequest
             'title' => ['sometimes', 'array'],
             'description' => ['sometimes', 'array'],
             'category_id' => ['sometimes', 'exists:categories,id'],
-            'video' => ['sometimes', 'file', 'mimes:mp4,mov,avi,wmv', 'max:204800'],
         ];
     }
 }
