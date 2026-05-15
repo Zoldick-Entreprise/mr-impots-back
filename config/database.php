@@ -99,6 +99,12 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => env('DB_SSLMODE', 'prefer'),
+            'options' => [
+                // This explicitly stops Horizon/PHP from looking for the /root/.postgresql/ file
+                1012 => null, // Équivaut à PDO::PGSQL_ATTR_SSL_CERT
+                1013 => null, // Équivaut à PDO::PGSQL_ATTR_SSL_KEY
+                1014 => null, // Équivaut à PDO::PGSQL_ATTR_SSL_ROOTCERT
+            ],
         ],
 
         'sqlsrv' => [
