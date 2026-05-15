@@ -76,6 +76,12 @@ COPY docker/fpm-pool.conf /usr/local/etc/php-fpm.d/zz-docker.conf
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
+# Nginx et Supervisor (en mode non-root) doivent pouvoir écrire dans leurs répertoires de travail
+RUN mkdir -p /var/lib/nginx/tmp /var/log/nginx /var/run/nginx /var/log/supervisor /var/run/supervisor \
+    && chown -R www-data:www-data /var/lib/nginx /var/log/nginx /var/run/nginx /var/log/supervisor /var/run/supervisor /etc/supervisord.conf
+
+USER www-data
+
 # Expose HTTP port
 EXPOSE 80
 
