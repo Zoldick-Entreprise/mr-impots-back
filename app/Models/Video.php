@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Traits\HasFavorites;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -35,7 +36,7 @@ use Spatie\Translatable\HasTranslations;
 // Media
 final class Video extends Model implements HasMedia
 {
-    use HasTranslations, HasUuids, InteractsWithMedia;
+    use HasFavorites, HasTranslations, HasUuids, InteractsWithMedia;
 
     /**
      * The attributes that are appended to the model's array representation.
@@ -84,7 +85,9 @@ final class Video extends Model implements HasMedia
             get: fn () => Cache::remember(
                 "video_url_{$this->id}",
                 ttl: fn ($url) => $url !== null ? 3570 : 0,
-                callback: fn () => $this->getFirstMedia('video')?->getTemporaryUrl(now()->addHour())
+                callback: fn () => $this->getFirstMedia(
+                    'video',
+                )?->getTemporaryUrl(now()->addHour()),
             ),
         );
     }
@@ -100,7 +103,9 @@ final class Video extends Model implements HasMedia
             get: fn () => Cache::remember(
                 "thumbnail_url_{$this->id}",
                 ttl: fn ($url) => $url !== null ? 3570 : 0,
-                callback: fn () => $this->getFirstMedia('video')?->getTemporaryUrl(now()->addHour(), 'preview')
+                callback: fn () => $this->getFirstMedia(
+                    'video',
+                )?->getTemporaryUrl(now()->addHour(), 'preview'),
             ),
         );
     }
@@ -117,9 +122,7 @@ final class Video extends Model implements HasMedia
 
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection('video')
-            ->useDisk('r2')
-            ->singleFile();
+        $this->addMediaCollection('video')->useDisk('r2')->singleFile();
     }
 
     public function registerMediaConversions(?Media $media = null): void

@@ -34,6 +34,10 @@ final class VideoResource extends JsonResource
             'views_count' => $this->resource->views_count,
             'published_at' => $this->resource->published_at?->toIso8601String(),
             'category' => new CategoryResource($this->whenLoaded('category')),
+            'is_favorited' => $this->when(
+                $request->user() !== null,
+                fn () => $this->resource->isFavoritedBy($request->user()),
+            ),
         ];
     }
 }
