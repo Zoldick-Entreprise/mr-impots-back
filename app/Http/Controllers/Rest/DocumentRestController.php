@@ -93,7 +93,10 @@ final class DocumentRestController extends Controller
             ProcessDocumentOcr::dispatch($document->id, 'en');
         }
 
-        $document->refresh();
+        $document->update([
+            'status' => DocumentStatus::DRAFT,
+            'ocr_status' => OcrStatus::PENDING,
+        ]);
 
         return DocumentResource::make($document)->response();
     }
