@@ -42,6 +42,10 @@ final class DocumentResource extends JsonResource
                 'fr' => $this->resource->fr_document,
                 'en' => $this->resource->en_document,
             ],
+            'is_favorited' => $this->when(
+                $request->user() !== null,
+                fn () => $this->resource->isFavoritedBy($request->user()),
+            ),
         ];
     }
 }

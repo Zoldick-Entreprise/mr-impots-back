@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Enums\DocumentStatus;
 use App\Enums\OcrStatus;
+use App\Traits\HasFavorites;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
@@ -59,7 +60,7 @@ use function Illuminate\Support\now;
 ]
 final class Document extends Model implements HasMedia
 {
-    use HasFactory, HasTranslations, HasUuids, InteractsWithMedia;
+    use HasFactory, HasFavorites, HasTranslations, HasUuids, InteractsWithMedia;
 
     /**
      * The attributes that are translatable.

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\API\FavoriteController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Customer\CategoryController;
 use App\Http\Controllers\Customer\DocumentController;
@@ -21,21 +22,43 @@ Route::prefix('admin')
         Route::get('/users', [UserRestController::class, 'index']);
         Route::get('/admins', [UserRestController::class, 'admins']);
         Route::post('/admins', [UserRestController::class, 'storeAdmin']);
-        Route::patch('/users/{user}/role', [UserRestController::class, 'updateRole']);
+        Route::patch('/users/{user}/role', [
+            UserRestController::class,
+            'updateRole',
+        ]);
 
         // Categories
-        Route::apiResource('/categories', CategoryRestController::class)
-            ->whereUuid('category');
+        Route::apiResource(
+            '/categories',
+            CategoryRestController::class,
+        )->whereUuid('category');
 
         // Videos
-        Route::apiResource('/videos', VideoRestController::class)->whereUuid('video');
-        Route::post('/videos/{video}/upload', [VideoRestController::class, 'upload']);
-        Route::post('/videos/{video}/toggle-publish', [VideoRestController::class, 'togglePublish']);
+        Route::apiResource('/videos', VideoRestController::class)->whereUuid(
+            'video',
+        );
+        Route::post('/videos/{video}/upload', [
+            VideoRestController::class,
+            'upload',
+        ]);
+        Route::post('/videos/{video}/toggle-publish', [
+            VideoRestController::class,
+            'togglePublish',
+        ]);
 
         // Documents
-        Route::apiResource('/documents', DocumentRestController::class)->whereUuid('document');
-        Route::post('/documents/{document}/upload', [DocumentRestController::class, 'upload']);
-        Route::post('/documents/{document}/toggle-publish', [DocumentRestController::class, 'togglePublish']);
+        Route::apiResource(
+            '/documents',
+            DocumentRestController::class,
+        )->whereUuid('document');
+        Route::post('/documents/{document}/upload', [
+            DocumentRestController::class,
+            'upload',
+        ]);
+        Route::post('/documents/{document}/toggle-publish', [
+            DocumentRestController::class,
+            'togglePublish',
+        ]);
     });
 
 Route::prefix('auth')
@@ -67,6 +90,22 @@ Route::prefix('auth')
         });
     });
 
+Route::middleware(['auth:sanctum', SetLocale::class])->group(function () {
+    // Favorites
+    Route::get('/favorites', [
+        FavoriteController::class,
+        'index',
+    ])->name('favorites.index');
+    Route::post('/favorites', [
+        FavoriteController::class,
+        'store',
+    ])->name('favorites.store');
+    Route::delete('/favorites/{id?}', [
+        FavoriteController::class,
+        'destroy',
+    ])->name('favorites.destroy');
+});
+
 Route::prefix('profile')
     ->middleware(['auth:sanctum', SetLocale::class])
     ->group(function () {
@@ -93,7 +132,10 @@ Route::middleware([SetLocale::class])->group(function () {
         Route::get('/documents', [DocumentController::class, 'index'])->name(
             'customer.documents.index',
         );
-        Route::get('/documents/{document}/pages', [DocumentController::class, 'getPages'])
+        Route::get('/documents/{document}/pages', [
+            DocumentController::class,
+            'getPages',
+        ])
             ->name('customer.documents.pages')
             ->whereUuid('document');
         Route::get('/documents/{document}', [DocumentController::class, 'show'])
@@ -101,7 +143,12 @@ Route::middleware([SetLocale::class])->group(function () {
             ->whereUuid('document');
 
         // Search
-        Route::get('/search', [SearchController::class, 'search'])->name('customer.search');
-        Route::get('/search/recent', [SearchController::class, 'recentsSearch'])->name('customer.search.recent');
+        Route::get('/search', [SearchController::class, 'search'])->name(
+            'customer.search',
+        );
+        Route::get('/search/recent', [
+            SearchController::class,
+            'recentsSearch',
+        ])->name('customer.search.recent');
     });
 });

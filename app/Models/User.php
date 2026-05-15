@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
@@ -20,8 +21,6 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['name', 'email', 'password', 'google_id', 'preferred_language'])]
-#[Hidden(['password', 'remember_token'])]
 /**
  * Represents a user in the system.
  *
@@ -35,10 +34,17 @@ use Spatie\Permission\Traits\HasRoles;
  * @property-read Carbon $updated_at The last update timestamp of the user.
  * @property-read Media $avatar The avatar media of the user.
  */
+#[Fillable(['name', 'email', 'password', 'google_id', 'preferred_language'])]
+#[Hidden(['password', 'remember_token'])]
 final class User extends Authenticatable implements HasMedia
 {
     /** @use HasFactory<UserFactory> */
-    use HasApiTokens, HasFactory, HasRoles, HasUuids, InteractsWithMedia, Notifiable;
+    use HasApiTokens,
+        HasFactory,
+        HasRoles,
+        HasUuids,
+        InteractsWithMedia,
+        Notifiable;
 
     /**
      * The accessors to append to the model's array form.
@@ -80,6 +86,16 @@ final class User extends Authenticatable implements HasMedia
      */
     public function avatar(): Attribute
     {
-        return Attribute::get(fn () => $this->getFirstMediaUrl('avatar') ?: null);
+        return Attribute::get(
+            fn () => $this->getFirstMediaUrl('avatar') ?: null,
+        );
+    }
+
+    /**
+     * Get the favorites of the user.
+     */
+    public function favorites(): HasMany
+    {
+        return $this->hasMany(Favorite::class);
     }
 }
