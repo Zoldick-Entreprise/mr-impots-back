@@ -7,7 +7,9 @@ namespace App\Http\Controllers\Customer;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdatePasswordRequest;
 use App\Http\Requests\UpdateProfileRequest;
+use App\Http\Resources\DownloadResource;
 use App\Http\Resources\UserResource;
+use App\Models\Download;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -96,6 +98,17 @@ final class ProfileController extends Controller
 
         return response()->json([
             'message' => __('auth.password_updated'),
+        ]);
+    }
+
+    public function downloads(Request $request): JsonResponse
+    {
+        $downloads = Download::where('user_id', auth()->id())
+            ->latest()
+            ->paginate();
+
+        return response()->json([
+            'data' => DownloadResource::collection($downloads),
         ]);
     }
 }

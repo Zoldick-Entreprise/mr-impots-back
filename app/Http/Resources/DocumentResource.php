@@ -34,16 +34,15 @@ final class DocumentResource extends JsonResource
             'document_views' => $this->resource->document_views,
             'published_at' => $this->resource->published_at,
             'created_at' => $this->resource->created_at,
-
-            'category' => new CategoryResource($this->whenLoaded('category')),
-            'uploaded_by' => new UserResource($this->whenLoaded('uploadedBy')),
-
-            'files' => [
-                'fr' => $this->resource->fr_document,
-                'en' => $this->resource->en_document,
-            ],
+            'category' => CategoryResource::make($this->whenLoaded('category')),
+            'uploaded_by' => $this->when(
+                $request->user() !== null &&
+                    $request->user()->can('admin.access'),
+                fn () => UserResource::make($this->whenLoaded('uploadedBy')),
+            ),
             'is_favorited' => $this->when(
-                $request->user() !== null,
+                $request->user() !== null &&
+                    ! $request->user()->can('admin.access'),
                 fn () => $this->resource->isFavoritedBy($request->user()),
             ),
         ];

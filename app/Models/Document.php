@@ -20,6 +20,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Translatable\HasTranslations;
 
 use function Illuminate\Support\now;
@@ -111,6 +112,14 @@ final class Document extends Model implements HasMedia
         );
     }
 
+    public function documentFrom(string $locale): Media
+    {
+        return match ($locale) {
+            'fr' => $this->getFirstMedia('document_fr'),
+            'en' => $this->getFirstMedia('document_en'),
+        };
+    }
+
     public function titleFr(): Attribute
     {
         return Attribute::make(
@@ -123,6 +132,11 @@ final class Document extends Model implements HasMedia
         return Attribute::make(
             get: fn () => $this->getTranslations('title', ['en']),
         );
+    }
+
+    public function isPublished(): bool
+    {
+        return $this->status === DocumentStatus::PUBLISHED;
     }
 
     #[Scope]
@@ -194,11 +208,13 @@ final class Document extends Model implements HasMedia
         return $this->hasMany(OcrJob::class);
     }
 
-    // /**
-    //  * Get the tags associated with the document.
-    //  */
-    // public function tags(): BelongsToMany
-    // {
-    //     return $this->belongsToMany(Tag::class);
-    // }
+    /**
+     * Get the related downloads of this document.
+     *
+     * @return HasMany<Download>
+     */
+    public function downloads(): HasMany
+    {
+        return $this->hasMany(Download::class);
+    }
 }

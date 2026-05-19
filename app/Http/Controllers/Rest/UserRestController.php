@@ -122,7 +122,7 @@ final class UserRestController extends Controller
         $admin->assignRole($validated['role']);
 
         if (! empty($validated['permissions'])) {
-            $admin->syncPermissions($validated['permissions']);
+            $admin->syncPermissions([...$validated['permissions'], Permission::ADMIN_ACCESS]);
         }
 
         return response()->json(
