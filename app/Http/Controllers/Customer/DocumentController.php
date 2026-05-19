@@ -7,10 +7,12 @@ namespace App\Http\Controllers\Customer;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\DocumentPageResource;
 use App\Http\Resources\DocumentResource;
+use App\Models\Download;
 use App\Repositories\Contracts\DocumentRepository;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * Class DocumentController
@@ -80,5 +82,42 @@ final class DocumentController extends Controller
 
         return DocumentPageResource::collection($pages)
             ->response();
+    }
+
+    /**
+     * Download the specified published document.
+     *
+     * @param  string  $id  The ID of the document.
+     * @return JsonResponse|StreamedResponse The download response.
+     */
+    public function download(string $id): JsonResponse|StreamedResponse
+    {
+        $document = $this->repository->retrieve($id);
+
+        if (! $document || ! $document->isPublished()) {
+            return response()->json(['message' => 'Document not found'], 404);
+        }
+
+        Download::create([
+            'document_id' => $document->id,
+            'user_id' => auth()->id(), // null pour les visiteurs
+            'ip' => request()->ip(),
+        ]);
+
+        $file = $document->documentFrom(app()->getLocale());
+
+        return response()->streamDownload(
+            function () use ($file) {
+                $stream = $file->stream();
+                fpassthru($stream);
+                if (is_resource($stream)) {
+                    fclose($stream);
+                }
+            },
+            $file->file_name ?? 'document.pdf',
+            [
+                'Content-Type' => 'application/pdf',
+            ],
+        );
     }
 }

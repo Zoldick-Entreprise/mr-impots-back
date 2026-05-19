@@ -112,6 +112,7 @@ Route::prefix('profile')
         Route::get('/', [ProfileController::class, 'me']);
         Route::patch('/', [ProfileController::class, 'update']);
         Route::patch('/password', [ProfileController::class, 'updatePassword']);
+        Route::post('/downloads', [ProfileController::class, 'downloads']);
     });
 
 Route::middleware([SetLocale::class])->group(function () {
@@ -151,4 +152,10 @@ Route::middleware([SetLocale::class])->group(function () {
             'recentsSearch',
         ])->name('customer.search.recent');
     });
+});
+
+Route::middleware([SetLocale::class])->group(function () {
+    Route::get('/documents/{document}/download', [DocumentController::class, 'download'])
+        ->name('customer.documents.download')
+        ->whereUuid('document');
 });

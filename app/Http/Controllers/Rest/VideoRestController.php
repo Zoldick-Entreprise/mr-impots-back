@@ -100,7 +100,10 @@ final class VideoRestController extends Controller
 
         $this->authorize('update', $video);
 
-        $video = $this->videoRepository->update($video, ['published' => ! $video->published]);
+        $video = $this->videoRepository->update($video, [
+            'published' => ! $video->published,
+            'published_at' => ! $video->published ? now() : null,
+        ]);
 
         return VideoResource::make($video)->response();
     }
